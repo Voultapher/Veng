@@ -5,9 +5,10 @@
 #include <SDL/SDL.h>
 #include <GL/glew.h>
 
-#include "GLSLProgram.h"
-#include "Sprite.h"
-#include "GLTexture.h"
+#include <Veng/Veng.h>
+#include <Veng/GLSLProgram.h>
+#include <Veng/Sprite.h>
+#include <Veng/Window.h>
 
 enum class GameState{PLAY, EXIT};
 
@@ -27,14 +28,14 @@ private:
 	void drawGraphics();
 	void calculateFPS();
 
-	SDL_Window* _window;
+	Veng::Window _window;
 	int _screenWidth;
 	int _screenHeight;
 	GameState _gameState;
 
-	std::vector<Sprite *> _sprites;
+	std::vector<Veng::Sprite *> _sprites;
 
-	GLSLProgram _colorProgram;
+	Veng::GLSLProgram _colorProgram;
 
 	float _fps;
 	float _maxFPS;

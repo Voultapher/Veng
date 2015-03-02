@@ -3,10 +3,9 @@
 #include <cstdlib>
 
 #include "MainGame.h"
-#include "Errors.h"
+#include <Veng/Errors.h>
 
 MainGame::MainGame() : 
-	_window(nullptr),
 	_screenWidth(1280),
 	_screenHeight(720),
 	_gameState(GameState::PLAY),
@@ -26,7 +25,7 @@ void MainGame::run(){
 
 	int numSprites = 2;
 	for (int i = 0; i < numSprites; i++){ // create sprites
-		_sprites.push_back(new Sprite());
+		_sprites.push_back(new Veng::Sprite());
 		float posSprite = (float)(i+1) / (float)numSprites;
 		_sprites.back()->init(posSprite-1.0f, posSprite-1.0f, posSprite, posSprite, "Textures/Player/p1_front.png");
 	}
@@ -35,31 +34,10 @@ void MainGame::run(){
 }
 
 void MainGame::initSystems(){
-	//Initialize SDL
-	SDL_Init(SDL_INIT_EVERYTHING);
 
-	_window = SDL_CreateWindow("Graphics Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _screenWidth, _screenHeight, SDL_WINDOW_OPENGL);
-	if (_window == nullptr){
-		fatalError("SDL window could not be created!");
-	}
+	Veng::init();
 
-	SDL_GLContext glContext = SDL_GL_CreateContext(_window);
-	if (glContext == nullptr){
-		fatalError("SDL_GL could not be created");
-	}
-
-	GLenum error = glewInit();
-	if (error != GLEW_OK){
-		fatalError("Could not initialize glew");
-	}
-
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-	glClearColor(0.02f, 0.07f, 0.09f, 1.0f);
-
-	printf("*** OpenGL Versiojn %s ***", glGetString(GL_VERSION));
-
-	SDL_GL_SetSwapInterval(1); // 0 = V-SYNC off, 1 = V-SYNC on
+	_window.create("Graphics-Engine", _screenWidth, _screenHeight, 0);
 
 	initShaders();
 }
@@ -130,7 +108,7 @@ void MainGame::drawGraphics(){
 
 	_colorProgram.unUse();
 
-	SDL_GL_SwapWindow(_window);
+	_window.swapBuffer();
 }
 
 void MainGame::calculateFPS(){

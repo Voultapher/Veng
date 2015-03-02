@@ -3,10 +3,13 @@
 #include <vector>
 #include <string>
 
-class IOManager
-{
-public:
+namespace Veng{
 
-	static bool readFileToBuffer(std::string filePath, std::vector<unsigned char>& buffer);
-};
+	class IOManager
+	{
+	public:
 
+		static bool readFileToBuffer(std::string filePath, std::vector<unsigned char>& buffer);
+	};
+
+}

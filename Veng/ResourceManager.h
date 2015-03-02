@@ -4,13 +4,16 @@
 
 #include "TextureCache.h"
 
-class ResourceManager
-{
-public:
+namespace Veng{
 
-	static GLTexture getTexture(std::string texturePath);
+	class ResourceManager
+	{
+	public:
 
-private:
-	static TextureCache _textureCache;
-};
+		static GLTexture getTexture(std::string texturePath);
 
+	private:
+		static TextureCache _textureCache;
+	};
+
+}

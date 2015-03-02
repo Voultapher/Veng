@@ -3,31 +3,34 @@
 #include <string>
 #include <GL/glew.h>
 
-class GLSLProgram
-{
-public:
-	GLSLProgram();
-	~GLSLProgram();
+namespace Veng{
 
-	void compileShaders(const std::string& vertexShaderFilePath, const std::string& fragmentShaderFilePath);
+	class GLSLProgram
+	{
+	public:
+		GLSLProgram();
+		~GLSLProgram();
 
-	void linkShaders();
+		void compileShaders(const std::string& vertexShaderFilePath, const std::string& fragmentShaderFilePath);
 
-	void addAttribute(const std::string& attributeName);
+		void linkShaders();
 
-	GLint getUniformLocation(const std::string& uniformName);
+		void addAttribute(const std::string& attributeName);
 
-	void use();
-	void unUse();
+		GLint getUniformLocation(const std::string& uniformName);
 
-private:
-	int _numAttributes;
+		void use();
+		void unUse();
 
-	void compileShader(const std::string filePath, GLuint& id);
+	private:
+		int _numAttributes;
 
-	GLuint _programID;
+		void compileShader(const std::string filePath, GLuint& id);
 
-	GLuint _vertexShaderID;
-	GLuint _fragmentShaderID;
-};
+		GLuint _programID;
 
+		GLuint _vertexShaderID;
+		GLuint _fragmentShaderID;
+	};
+
+}
