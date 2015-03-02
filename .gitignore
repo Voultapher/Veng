@@ -5,12 +5,12 @@ Shaders/
 Textures
 x64/
 
-#Graphics-Engine-v1.1.vcxproj
-#Graphics-Engine-v1.1.vcxproj.filters
+Graphics-Engine-v1.1.vcxproj
+Graphics-Engine-v1.1.vcxproj.filters
 Graphics-Engine-v1.1.sdf
 Graphics-Engine-v1.1.sln
 Graphics-Engine-v1.1.suo
-#Graphics-Engine-v1.1.v12.suo
+Graphics-Engine-v1.1.v12.suo
 Veng.vcxproj
 Veng.vcxproj.filters
 
