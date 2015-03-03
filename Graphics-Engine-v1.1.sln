@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Graphics-Engine-v1.1", "Graphics-Engine-v1.1\Graphics-Engine-v1.1.vcxproj", "{E4CDBFDB-7A65-4504-82AE-12C21C0689A3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B73A2B93-50A8-4F99-8441-B3E4D018F8B9} = {B73A2B93-50A8-4F99-8441-B3E4D018F8B9}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Veng", "Veng\Veng.vcxproj", "{B73A2B93-50A8-4F99-8441-B3E4D018F8B9}"
 EndProject

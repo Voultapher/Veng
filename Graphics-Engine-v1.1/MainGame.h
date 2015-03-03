@@ -9,6 +9,8 @@
 #include <Veng/GLSLProgram.h>
 #include <Veng/Sprite.h>
 #include <Veng/Window.h>
+#include <Veng/Camera2D.h>
+#include <Veng/SpriteBatch.h>
 
 enum class GameState{PLAY, EXIT};
 
@@ -33,9 +35,9 @@ private:
 	int _screenHeight;
 	GameState _gameState;
 
-	std::vector<Veng::Sprite *> _sprites;
-
 	Veng::GLSLProgram _colorProgram;
+	Veng::Camera2D _camera;
+	Veng::SpriteBatch _spriteBatch;
 
 	float _fps;
 	float _maxFPS;

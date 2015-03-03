@@ -4,46 +4,53 @@
 
 namespace Veng{
 
-	struct Position{
-		float x;
-		float y;
-	};
+struct Position{
+	float x;
+	float y;
+};
 
-	struct Color{
-		GLubyte r;
-		GLubyte g;
-		GLubyte b;
-		GLubyte a;
-	};
+struct Color{
+	GLubyte r;
+	GLubyte g;
+	GLubyte b;
+	GLubyte a;
 
-	struct UV{
-		float u;
-		float v;
-	};
+	void setColor(GLubyte R, GLubyte G, GLubyte B, GLubyte A){
+		r = R;
+		g = G;
+		b = B;
+		a = A;
+	}
+};
 
-	struct Vertex{
-		Position position;
+struct UV{
+	float u;
+	float v;
+};
 
-		Color color;
+struct Vertex{
+	Position position;
 
-		UV uv;
+	Color color;
 
-		void setPosition(float x, float y){
-			position.x = x;
-			position.y = y;
-		}
+	UV uv;
 
-		void setColor(GLubyte r, GLubyte g, GLubyte b, GLubyte a){
-			color.r = r;
-			color.g = g;
-			color.b = b;
-			color.a = a;
-		}
+	void setPosition(float x, float y){
+		position.x = x;
+		position.y = y;
+	}
 
-		void setUV(float u, float v){
-			uv.u = u;
-			uv.v = v;
-		}
-	};
+	void setColor(GLubyte r, GLubyte g, GLubyte b, GLubyte a){
+		color.r = r;
+		color.g = g;
+		color.b = b;
+		color.a = a;
+	}
+
+	void setUV(float u, float v){
+		uv.u = u;
+		uv.v = v;
+	}
+};
 
 }
