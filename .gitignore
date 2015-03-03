@@ -1,7 +1,6 @@
 #custom ignores
 deps/
 Debug/
-Shaders/
 Textures
 x64/
 
