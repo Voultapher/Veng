@@ -12,7 +12,7 @@ namespace Veng{
 	{
 	}
 
-	int Window::create(std::string windowName, int screenWidth, int screenHeight, unsigned int currentFlags){
+	int Window::create(std::string windowName, int screenWidth, int screenHeight, unsigned int currentFlags, unsigned char vsyncFlag){
 		_screenWidth = screenWidth;
 		_screenHeight = screenHeight;
 
@@ -52,7 +52,12 @@ namespace Veng{
 
 		printf("*** OpenGL Versiojn %s ***", glGetString(GL_VERSION));
 
-		SDL_GL_SetSwapInterval(1); // 0 = V-SYNC off, 1 = V-SYNC on
+		if (vsyncFlag == VSYNC_ON){ // set Vsync on or off
+			SDL_GL_SetSwapInterval(1);
+		}
+		else if (vsyncFlag == VSYNC_OFF){
+			SDL_GL_SetSwapInterval(0);
+		}
 
 		return 0; //everything worked
 	}

@@ -10,8 +10,10 @@ MainGame::MainGame() :
 	_screenWidth(1280),
 	_screenHeight(720),
 	_gameState(GameState::PLAY),
-	_maxFPS(60.0f),
-	_time(0)
+	_maxFPS(90.0f),
+	_time(0),
+	_vsyncFlag(Veng::VSYNC_ON),
+	_windowFlags(Veng::BORDERLESS)
 {
 
 }
@@ -31,11 +33,12 @@ void MainGame::initSystems(){
 
 	Veng::init();
 
-	_window.create("Graphics-Engine", _screenWidth, _screenHeight, 0);
+	_window.create("Graphics-Engine", _screenWidth, _screenHeight, _windowFlags, _vsyncFlag);
 	_camera.init(_screenWidth, _screenHeight);
 
 	initShaders();
 	_spriteBatch.init();
+	_fpsLimiter.init(_maxFPS);
 }
 
 void MainGame::initShaders(){
@@ -47,36 +50,34 @@ void MainGame::initShaders(){
 }
 
 void MainGame::gameLoop(){
+	static int frameCounter = 0;
+
 	while (_gameState != GameState::EXIT){ // check for game states
 
-		// float startTicks = SDL_GetTicks(); // used for frame time measuring
+		_fpsLimiter.begin();
+
 		processInput();
 		_time += 0.05;
 
 		_camera.update();
 
 		drawGraphics();
-		calculateFPS();
 
-		static int frameCounter = 0;
+		_fps = _fpsLimiter.end();
+
 		frameCounter++;
 		if (frameCounter == 10){
-			printf("%.2f\n", _fps); // print only once every 10 frames
+			printf("%.2f\n", _fps); // print fps only every 10 frames
 			frameCounter = 0;
 		}
-
-		/* float frameTicks = (SDL_GetTicks()) - startTicks; // this is commented out as I have turned on V-SYNC
-		if (1000.0f / _maxFPS > frameTicks){
-			SDL_Delay(1000.0f / (_maxFPS - frameTicks));
-		} */
 	}
 }
 
 void MainGame::processInput(){
 	SDL_Event evnt;
 
-	const float CAMERA_SPEED = 100.0f;
-	const float SCALE_SPEED = 0.1f;
+	const float CAMERA_SPEED = 5.0f;
+	const float SCALE_SPEED = 0.02f;
 
 	while (SDL_PollEvent(&evnt)){
 		switch (evnt.type){
@@ -87,28 +88,36 @@ void MainGame::processInput(){
 			//std::cout << evnt.motion.x << " " << evnt.motion.y << "\n";
 			break;
 		case SDL_KEYDOWN:
-			switch (evnt.key.keysym.sym){ // diffrent key events
-			case SDLK_w:
-				_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED));
-				break;
-			case SDLK_s:
-				_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
-				break;
-			case SDLK_a:
-				_camera.setPosition(_camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
-				break;
-			case SDLK_d:
-				_camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f));
-				break;
-
-			case SDLK_q:
-				_camera.setScale(_camera.getScale() + SCALE_SPEED);
-				break;
-			case SDLK_e:
-				_camera.setScale(_camera.getScale() - SCALE_SPEED);
-				break;
-			}
+			_inputManager.keyDown(evnt.key.keysym.sym);
+			break;
+		case SDL_KEYUP:
+			_inputManager.keyUp(evnt.key.keysym.sym);
+			break;
 		}
+	}
+
+	if (_inputManager.isKeyPressed(SDLK_w)){
+		_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED));
+	}
+
+	if (_inputManager.isKeyPressed(SDLK_s)){
+		_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
+	}
+
+	if (_inputManager.isKeyPressed(SDLK_a)){
+		_camera.setPosition(_camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
+	}
+
+	if (_inputManager.isKeyPressed(SDLK_d)){
+		_camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f));
+	}
+
+	if (_inputManager.isKeyPressed(SDLK_q)){
+		_camera.setScale(_camera.getScale() + SCALE_SPEED);
+	}
+
+	if (_inputManager.isKeyPressed(SDLK_e)){
+		_camera.setScale(_camera.getScale() - SCALE_SPEED);
 	}
 }
 
@@ -137,7 +146,7 @@ void MainGame::drawGraphics(){
 	color.setColor(220, 218, 148, 255);
 
 	for (int i = 0; i < 1000; i++){
-		_spriteBatch.draw(pos + glm::vec4((float)i*50, sin(_time) * 100, 0.0f, 0.0f), uv, texture.id, 0.0f, color);
+		_spriteBatch.draw(pos + glm::vec4((float)i*60 + sin(i)*10, sin(_time) * 100, 0.0f, 0.0f), uv, texture.id, 0.0f, color);
 	}
 
 	_spriteBatch.end();
@@ -149,44 +158,4 @@ void MainGame::drawGraphics(){
 	_colorProgram.unUse();
 
 	_window.swapBuffer();
-}
-
-void MainGame::calculateFPS(){
-	static const int NUM_SAMPLES = 10;
-	static float frameTimes[NUM_SAMPLES];
-	static int currentFrame = 0;
-
-	static float prevTicks = SDL_GetTicks();
-
-	float currentTicks;
-	currentTicks = SDL_GetTicks();
-
-	_frameTime = currentTicks - prevTicks;
-	frameTimes[currentFrame % NUM_SAMPLES] = _frameTime;
-
-	int count;
-	currentFrame++;
-
-	if (currentFrame < NUM_SAMPLES){
-		count = currentFrame;
-	}
-	else{
-		count = NUM_SAMPLES;
-	}
-
-	float frameTimeAverage = 0;
-	for (int i = 0; i < count; i++){
-		frameTimeAverage += frameTimes[i];
-	}
-	frameTimeAverage /= count;
-
-	if (frameTimeAverage > 0){
-		_fps = 1000.0f / frameTimeAverage;
-	}
-	else{
-		_fps = -666.0f; // the evil fps
-	}
-
-	prevTicks = currentTicks;
-
 }

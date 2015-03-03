@@ -11,6 +11,8 @@
 #include <Veng/Window.h>
 #include <Veng/Camera2D.h>
 #include <Veng/SpriteBatch.h>
+#include <Veng/InputManager.h>
+#include <Veng/Timing.h>
 
 enum class GameState{PLAY, EXIT};
 
@@ -38,11 +40,14 @@ private:
 	Veng::GLSLProgram _colorProgram;
 	Veng::Camera2D _camera;
 	Veng::SpriteBatch _spriteBatch;
+	Veng::InputManager _inputManager;
+	Veng::FpsLimiter _fpsLimiter;
 
-	float _fps;
 	float _maxFPS;
-	float _frameTime;
+	float _fps;
 
 	float _time;
+	Veng::Vsync _vsyncFlag;
+	unsigned int _windowFlags;
 };
 
