@@ -18,7 +18,7 @@ void FpsLimiter::setMaxFps(float maxFps){
 }
 
 void FpsLimiter::begin(){
-	_startTicks = SDL_GetTicks();
+	_startTicks = SDL_GetTicks(); // this will cause problems after more than 49 days of runtime
 }
 
 float FpsLimiter::end(){ // end will return the current fps

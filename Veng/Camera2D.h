@@ -21,6 +21,7 @@ namespace Veng{
 		float getScale() { return _scale; }
 		glm::vec2 getPosition() { return _position; }
 		glm::mat4 getCameraMatrix() { return _cameraMatrix; }
+		glm::vec2 convertScreenToWorld(glm::vec2 screenCoords);
 
 	private:
 		bool _needsMatrixUpdate;

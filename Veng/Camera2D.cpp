@@ -40,4 +40,12 @@ namespace Veng{
 		}
 	}
 
+	glm::vec2 Camera2D::convertScreenToWorld(glm::vec2 screenCoords){
+		screenCoords.y = _screenHeight - screenCoords.y;
+		screenCoords -= glm::vec2(_screenWidth / 2, _screenHeight / 2); // make the center 0
+		screenCoords /= _scale; // scale the coordinates
+		screenCoords += _position; // trasnslate with the camera position
+
+		return screenCoords;
+	}
 }

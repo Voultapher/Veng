@@ -14,6 +14,10 @@
 #include <Veng/InputManager.h>
 #include <Veng/Timing.h>
 
+#include <vector>
+
+#include "Bullet.h"
+
 enum class GameState{PLAY, EXIT};
 
 class MainGame
@@ -31,6 +35,8 @@ private:
 	void processInput();
 	void drawGraphics();
 	void calculateFPS();
+
+	std::vector<Bullet> _bullets;
 
 	Veng::Window _window;
 	int _screenWidth;

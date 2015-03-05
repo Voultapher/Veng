@@ -61,12 +61,25 @@ void MainGame::gameLoop(){
 
 		_camera.update();
 
+		int bulletsSize = _bullets.size();
+		for (int i = 0; i < bulletsSize;){ //update all bullets
+			if (_bullets[i].update()){
+				_bullets[i] = _bullets.back();
+				_bullets.pop_back();
+
+				bulletsSize--;
+			}
+			else{
+				i++;
+			}
+		}
+
 		drawGraphics();
 
 		_fps = _fpsLimiter.end();
 
 		frameCounter++;
-		if (frameCounter == 10){
+		if (frameCounter == 1000){
 			printf("%.2f\n", _fps); // print fps only every 10 frames
 			frameCounter = 0;
 		}
@@ -85,13 +98,19 @@ void MainGame::processInput(){
 			_gameState = GameState::EXIT;
 			break;
 		case SDL_MOUSEMOTION:
-			//std::cout << evnt.motion.x << " " << evnt.motion.y << "\n";
+			_inputManager.setMousePosition(evnt.motion.x, evnt.motion.y);
 			break;
 		case SDL_KEYDOWN:
 			_inputManager.keyDown(evnt.key.keysym.sym);
 			break;
 		case SDL_KEYUP:
 			_inputManager.keyUp(evnt.key.keysym.sym);
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			_inputManager.keyDown(evnt.button.button);
+			break;
+		case SDL_MOUSEBUTTONUP:
+			_inputManager.keyUp(evnt.button.button);
 			break;
 		}
 	}
@@ -119,6 +138,17 @@ void MainGame::processInput(){
 	if (_inputManager.isKeyPressed(SDLK_e)){
 		_camera.setScale(_camera.getScale() - SCALE_SPEED);
 	}
+
+	if (_inputManager.isKeyPressed(SDL_BUTTON_LEFT)){ // spawn bullets
+		glm::vec2 mousePosition = _inputManager.getMousePosition();
+		mousePosition = _camera.convertScreenToWorld(mousePosition);
+
+		glm::vec2 playerPosition(0.0f);
+		glm::vec2 direction = mousePosition - playerPosition;
+		direction = glm::normalize(direction);
+
+		_bullets.emplace_back(playerPosition, direction, 4.0f, 1000);
+	}
 }
 
 void MainGame::drawGraphics(){
@@ -131,8 +161,8 @@ void MainGame::drawGraphics(){
 	GLint textureLocation = _colorProgram.getUniformLocation("mySampler");
 	glUniform1f(textureLocation, 0); // ben says 1i but I think thats false
 
-	GLint timeLocation = _colorProgram.getUniformLocation("time");
-	glUniform1f(timeLocation, _time); //set time variable
+	//GLint timeLocation = _colorProgram.getUniformLocation("time");
+	//glUniform1f(timeLocation, _time); //set time variable
 
 	GLint pLocation = _colorProgram.getUniformLocation("P");
 	glm::mat4 cameraMatrix = _camera.getCameraMatrix();
@@ -145,8 +175,11 @@ void MainGame::drawGraphics(){
 	Veng::Color color;
 	color.setColor(220, 218, 148, 255);
 
-	for (int i = 0; i < 1000; i++){
-		_spriteBatch.draw(pos + glm::vec4((float)i*60 + sin(i)*10, sin(_time) * 100, 0.0f, 0.0f), uv, texture.id, 0.0f, color);
+	_spriteBatch.draw(pos, uv, texture.id, 0.0f, color);
+
+	int bulletsSize = _bullets.size();
+	for (int i = 0; i < bulletsSize; i++){
+		_bullets[i].draw(_spriteBatch);
 	}
 
 	_spriteBatch.end();
