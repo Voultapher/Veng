@@ -7,13 +7,14 @@
 #include <Veng/ResourceManager.h>
 
 MainGame::MainGame() : 
-	_screenWidth(1280),
-	_screenHeight(720),
+	_screenWidth(2560),
+	_screenHeight(1440),
 	_gameState(GameState::PLAY),
 	_maxFPS(90.0f),
 	_time(0),
 	_vsyncFlag(Veng::VSYNC_ON),
-	_windowFlags(Veng::BORDERLESS)
+	_windowFlags(Veng::FULLSCREEN),
+	_normUV(0.0f, 0.0f, 1.0f, 1.0f)
 {
 
 }
@@ -39,6 +40,11 @@ void MainGame::initSystems(){
 	initShaders();
 	_spriteBatch.init();
 	_fpsLimiter.init(_maxFPS);
+
+	const glm::vec2 PLAYER_SPAWN(0.0f, 0.0f);
+	_player1.init(glm::vec4(PLAYER_SPAWN.x, PLAYER_SPAWN.y, 69.0f, 92.0f), PLAYER_SPAWN, 0.0f, 100.0f);
+
+	_colorWhite.setColor(255, 255, 255, 255);
 }
 
 void MainGame::initShaders(){
@@ -89,8 +95,9 @@ void MainGame::gameLoop(){
 void MainGame::processInput(){
 	SDL_Event evnt;
 
-	const float CAMERA_SPEED = 5.0f;
-	const float SCALE_SPEED = 0.02f;
+	const float CAMERA_SPEED = 10.0f;
+	const float SCALE_SPEED = 1.02f;
+	const float MIN_SCALE = 0.1f;
 
 	while (SDL_PollEvent(&evnt)){
 		switch (evnt.type){
@@ -115,7 +122,12 @@ void MainGame::processInput(){
 		}
 	}
 
-	if (_inputManager.isKeyPressed(SDLK_w)){
+
+	if (_inputManager.isKeyPressed(SDLK_ESCAPE)){ // close the game with ESC
+		_gameState = GameState::EXIT;
+	}
+
+	if (_inputManager.isKeyPressed(SDLK_w)){ // player movement
 		_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED));
 	}
 
@@ -131,23 +143,43 @@ void MainGame::processInput(){
 		_camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f));
 	}
 
-	if (_inputManager.isKeyPressed(SDLK_q)){
-		_camera.setScale(_camera.getScale() + SCALE_SPEED);
+	if (_inputManager.isKeyPressed(SDLK_UP)){ // camera movement
+		_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED) / _camera.getScale());
+	}
+
+	if (_inputManager.isKeyPressed(SDLK_DOWN)){
+		_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, -CAMERA_SPEED) / _camera.getScale());
+	}
+
+	if (_inputManager.isKeyPressed(SDLK_LEFT)){
+		_camera.setPosition(_camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f) / _camera.getScale());
+	}
+
+	if (_inputManager.isKeyPressed(SDLK_RIGHT)){
+		_camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f) / _camera.getScale());
+	}
+
+	if (_inputManager.isKeyPressed(SDLK_q)){ // camera zoom
+		_camera.setScale(_camera.getScale() * SCALE_SPEED);
 	}
 
 	if (_inputManager.isKeyPressed(SDLK_e)){
-		_camera.setScale(_camera.getScale() - SCALE_SPEED);
+		if (_camera.getScale() > MIN_SCALE){
+			_camera.setScale(_camera.getScale() / SCALE_SPEED);
+		}
 	}
 
 	if (_inputManager.isKeyPressed(SDL_BUTTON_LEFT)){ // spawn bullets
 		glm::vec2 mousePosition = _inputManager.getMousePosition();
 		mousePosition = _camera.convertScreenToWorld(mousePosition);
 
-		glm::vec2 playerPosition(0.0f);
+		glm::vec2 playerPosition = _player1.getPosition();
 		glm::vec2 direction = mousePosition - playerPosition;
 		direction = glm::normalize(direction);
 
-		_bullets.emplace_back(playerPosition, direction, 4.0f, 1000);
+		float bulletSize = 30.0f;
+
+		_bullets.emplace_back(glm::vec4(playerPosition.x, playerPosition.y, bulletSize, bulletSize), direction, 4.0f, 1000);
 	}
 }
 
@@ -168,21 +200,18 @@ void MainGame::drawGraphics(){
 	glm::mat4 cameraMatrix = _camera.getCameraMatrix();
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &(cameraMatrix[0][0])); // upload camera Information to the GPU
 
-	_spriteBatch.begin();
-	glm::vec4 pos(0.0f, 0.0f, 50.0f, 50.0f);
-	glm::vec4 uv(0.0f, 0.0f, 1.0f, 1.0f);
-	static Veng::GLTexture texture = Veng::ResourceManager::getTexture("Textures/Player/p1_hurt.png");
-	Veng::Color color;
-	color.setColor(220, 218, 148, 255);
+	_spriteBatch.begin(); //
 
-	_spriteBatch.draw(pos, uv, texture.id, 0.0f, color);
+	static Veng::GLTexture playerTexture = Veng::ResourceManager::getTexture("Textures/Player/p1_hurt.png");
+	_spriteBatch.draw(_player1.getPosAndSize(), _normUV, playerTexture.id, 0.0f, _colorWhite); // draw the player
 
 	int bulletsSize = _bullets.size();
 	for (int i = 0; i < bulletsSize; i++){
-		_bullets[i].draw(_spriteBatch);
+		static Veng::GLTexture bulletTexture = Veng::ResourceManager::getTexture("Textures/Items/keyred.png"); //this is bad
+		_spriteBatch.draw(_bullets[i].getPosAndSize(), _normUV, bulletTexture.id, 0.0f, _colorWhite); // draw all bullets
 	}
 
-	_spriteBatch.end();
+	_spriteBatch.end(); //
 
 	_spriteBatch.renderBatches();
 

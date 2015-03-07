@@ -1,15 +1,17 @@
 #pragma once
 
-#include <glm/glm.hpp>j
-#include <Veng/SpriteBatch.h>
+#include <glm/glm.hpp>
 
 class Bullet
 {
 public:
-	Bullet(glm::vec2 position, glm::vec2 direction, float speed, int lifeTime);
+	Bullet(glm::vec4 posAndSize, glm::vec2 direction, float speed, int lifeTime);
 	~Bullet();
 
-	void draw(Veng::SpriteBatch&  spriteBatch);
+	glm::vec2 getPosition() const { return _position; }
+	glm::vec2 getDirection() const { return _direction; }
+	glm::vec4 getPosAndSize();
+
 	bool update(); // retuns true when lifeTime is 0
 
 private:
@@ -17,5 +19,6 @@ private:
 	float _speed;
 	glm::vec2 _position;
 	glm::vec2 _direction;
+	glm::vec4 _posAndSize;
 };
 

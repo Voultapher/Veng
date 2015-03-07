@@ -4,6 +4,7 @@
 
 #include <SDL/SDL.h>
 #include <GL/glew.h>
+#include <glm/glm.hpp>
 
 #include <Veng/Veng.h>
 #include <Veng/GLSLProgram.h>
@@ -17,6 +18,7 @@
 #include <vector>
 
 #include "Bullet.h"
+#include "Player.h"
 
 enum class GameState{PLAY, EXIT};
 
@@ -35,6 +37,8 @@ private:
 	void processInput();
 	void drawGraphics();
 	void calculateFPS();
+
+	Player _player1;
 
 	std::vector<Bullet> _bullets;
 
@@ -55,5 +59,8 @@ private:
 	float _time;
 	Veng::Vsync _vsyncFlag;
 	unsigned int _windowFlags;
+
+	glm::vec4 _normUV;
+	Veng::Color _colorWhite;
 };
 

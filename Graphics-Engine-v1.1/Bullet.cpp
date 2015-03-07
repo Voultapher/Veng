@@ -1,14 +1,14 @@
 #include "Bullet.h"
-#include <Veng/GLTexture.h>
-#include <Veng/ResourceManager.h>
 
 
-Bullet::Bullet(glm::vec2 position, glm::vec2 direction, float speed, int lifeTime)
+Bullet::Bullet(glm::vec4 posAndSize, glm::vec2 direction, float speed, int lifeTime)
 {
 	_lifeTime = lifeTime;
-	_position = position;
-	_direction = direction;
 	_speed = speed;
+	_position = glm::vec2(posAndSize.x, posAndSize.y);
+	_direction = direction;
+	_posAndSize = posAndSize;
+	
 }
 
 
@@ -16,14 +16,10 @@ Bullet::~Bullet()
 {
 }
 
-void Bullet::draw(Veng::SpriteBatch&  spriteBatch){
-	glm::vec4 posAndSize(_position.x, _position.y, 30.0f, 30.0f);
-	glm::vec4 uv(0.0f, 0.0f, 1.0f, 1.0f);
-	static Veng::GLTexture texture = Veng::ResourceManager::getTexture("Textures/Player/p1_hurt.png"); //this is bad
-	Veng::Color color;
-	color.setColor(220, 218, 148, 255);
-
-	spriteBatch.draw(posAndSize, uv, texture.id, 0.0f, color);
+glm::vec4 Bullet::getPosAndSize(){
+	_posAndSize.x = _position.x;
+	_posAndSize.y = _position.y;
+	return _posAndSize;
 }
 
 bool Bullet::update(){
