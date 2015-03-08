@@ -10,9 +10,13 @@ public:
 
 	void init(glm::vec4 boundry);
 
-	bool ableToMove(glm::vec2 position);
+	bool ableToMove(glm::vec4 posAndSize, glm::vec2 &direction);
 
 private:
+	glm::vec2 _up;
+	glm::vec2 _down;
+	glm::vec2 _left;
+	glm::vec2 _right;
 	glm::vec4 _boundry;
 };
 

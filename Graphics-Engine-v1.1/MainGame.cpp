@@ -47,7 +47,8 @@ void MainGame::initSystems(){
 
 	_colorWhite.setColor(255, 255, 255, 255);
 
-	_world.init(glm::vec4(-1000.0f, -1000.0f, 1000.0f, 1000.0f));
+	const float WORLD_SIZE = 3000.0f;
+	_world.init(glm::vec4(-WORLD_SIZE, -WORLD_SIZE, WORLD_SIZE, WORLD_SIZE));
 }
 
 void MainGame::initShaders(){
@@ -237,8 +238,8 @@ template<typename T>
 void MainGame::moveObject(T& object, glm::vec2 direction){
 
 	object.move(direction);
-	if (_world.ableToMove(object.getPosition()) == false){
-		direction *= -1.0f;
+	if (_world.ableToMove(object.getPosAndSize(), direction) == false){
+		object.setDirection(direction);
 		object.move(direction);
 	}
 }

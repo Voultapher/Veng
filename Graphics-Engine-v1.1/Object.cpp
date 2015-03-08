@@ -23,6 +23,10 @@ void Object::init(glm::vec4 posAndSize, glm::vec2 direction, float speed){
 	_posAndSize = posAndSize;
 }
 
-void Object::move(glm::vec2 _direction){
-	_position += _direction * _speed;
+void Object::move(glm::vec2 direction){
+	_position += direction * _speed;
+}
+
+void Object::setDirection(glm::vec2 direction){
+	_direction = direction;
 }

@@ -10,7 +10,8 @@ public:
 
 	virtual void init(glm::vec4 posAndSize, glm::vec2 direction, float speed);
 
-	virtual void move(glm::vec2 _direction);
+	virtual void move(glm::vec2 direction);
+	void setDirection(glm::vec2 direction);
 
 	float getSpeed() const { return _speed; }
 	glm::vec2 getPosition() const { return _position; }
