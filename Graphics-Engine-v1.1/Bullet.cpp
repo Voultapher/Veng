@@ -16,14 +16,8 @@ Bullet::~Bullet()
 {
 }
 
-glm::vec4 Bullet::getPosAndSize(){
-	_posAndSize.x = _position.x;
-	_posAndSize.y = _position.y;
-	return _posAndSize;
-}
 
 bool Bullet::update(){
-	_position += _direction * _speed;
 	_lifeTime--;
 	if (_lifeTime == 0){
 		return true;

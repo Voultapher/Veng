@@ -16,9 +16,11 @@
 #include <Veng/Timing.h>
 
 #include <vector>
+#include <functional>
 
 #include "Bullet.h"
 #include "Player.h"
+#include "World.h"
 
 enum class GameState{PLAY, EXIT};
 
@@ -38,8 +40,14 @@ private:
 	void drawGraphics();
 	void calculateFPS();
 
+	template<typename T>
+	void moveObject(T& object, glm::vec2 direction);
+
+	World _world;
+
 	Player _player1;
 
+	bool _bulletSpawnable;
 	std::vector<Bullet> _bullets;
 
 	Veng::Window _window;

@@ -7,13 +7,14 @@
 #include <Veng/ResourceManager.h>
 
 MainGame::MainGame() : 
-	_screenWidth(2560),
-	_screenHeight(1440),
+	_bulletSpawnable(true),
+	_screenWidth(1920),
+	_screenHeight(1080),
 	_gameState(GameState::PLAY),
 	_maxFPS(90.0f),
 	_time(0),
 	_vsyncFlag(Veng::VSYNC_ON),
-	_windowFlags(Veng::FULLSCREEN),
+	_windowFlags(Veng::BORDERLESS),
 	_normUV(0.0f, 0.0f, 1.0f, 1.0f)
 {
 
@@ -42,9 +43,11 @@ void MainGame::initSystems(){
 	_fpsLimiter.init(_maxFPS);
 
 	const glm::vec2 PLAYER_SPAWN(0.0f, 0.0f);
-	_player1.init(glm::vec4(PLAYER_SPAWN.x, PLAYER_SPAWN.y, 69.0f, 92.0f), PLAYER_SPAWN, 0.0f, 100.0f);
+	_player1.init(glm::vec4(PLAYER_SPAWN.x, PLAYER_SPAWN.y, 69.0f, 92.0f), PLAYER_SPAWN, 5.0f, 100.0f);
 
 	_colorWhite.setColor(255, 255, 255, 255);
+
+	_world.init(glm::vec4(-1000.0f, -1000.0f, 1000.0f, 1000.0f));
 }
 
 void MainGame::initShaders(){
@@ -69,6 +72,7 @@ void MainGame::gameLoop(){
 
 		int bulletsSize = _bullets.size();
 		for (int i = 0; i < bulletsSize;){ //update all bullets
+			moveObject(_bullets[i], _bullets[i].getDirection());
 			if (_bullets[i].update()){
 				_bullets[i] = _bullets.back();
 				_bullets.pop_back();
@@ -85,9 +89,11 @@ void MainGame::gameLoop(){
 		_fps = _fpsLimiter.end();
 
 		frameCounter++;
-		if (frameCounter == 1000){
+		if (frameCounter == 10){
 			printf("%.2f\n", _fps); // print fps only every 10 frames
 			frameCounter = 0;
+
+			_bulletSpawnable = true;
 		}
 	}
 }
@@ -128,19 +134,19 @@ void MainGame::processInput(){
 	}
 
 	if (_inputManager.isKeyPressed(SDLK_w)){ // player movement
-		_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED));
+		moveObject(_player1, glm::vec2(0.0f, 1.0f));
 	}
 
 	if (_inputManager.isKeyPressed(SDLK_s)){
-		_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
+		moveObject(_player1, glm::vec2(0.0f, -1.0f));
 	}
 
 	if (_inputManager.isKeyPressed(SDLK_a)){
-		_camera.setPosition(_camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
+		moveObject(_player1, glm::vec2(-1.0f, 0.0f));
 	}
 
 	if (_inputManager.isKeyPressed(SDLK_d)){
-		_camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f));
+		moveObject(_player1, glm::vec2(1.0f, 0.0f));
 	}
 
 	if (_inputManager.isKeyPressed(SDLK_UP)){ // camera movement
@@ -170,16 +176,20 @@ void MainGame::processInput(){
 	}
 
 	if (_inputManager.isKeyPressed(SDL_BUTTON_LEFT)){ // spawn bullets
-		glm::vec2 mousePosition = _inputManager.getMousePosition();
-		mousePosition = _camera.convertScreenToWorld(mousePosition);
+		if (_bulletSpawnable){
+			glm::vec2 mousePosition = _inputManager.getMousePosition();
+			mousePosition = _camera.convertScreenToWorld(mousePosition);
 
-		glm::vec2 playerPosition = _player1.getPosition();
-		glm::vec2 direction = mousePosition - playerPosition;
-		direction = glm::normalize(direction);
+			glm::vec2 playerPosition = _player1.getPosition();
+			glm::vec2 direction = mousePosition - playerPosition;
+			direction = glm::normalize(direction);
 
-		float bulletSize = 30.0f;
+			float bulletSize = 30.0f;
 
-		_bullets.emplace_back(glm::vec4(playerPosition.x, playerPosition.y, bulletSize, bulletSize), direction, 4.0f, 1000);
+			_bullets.emplace_back(glm::vec4(playerPosition.x, playerPosition.y, bulletSize, bulletSize), direction, 8.0f, 1000);
+
+			_bulletSpawnable = false;
+		}
 	}
 }
 
@@ -203,11 +213,12 @@ void MainGame::drawGraphics(){
 	_spriteBatch.begin(); //
 
 	static Veng::GLTexture playerTexture = Veng::ResourceManager::getTexture("Textures/Player/p1_hurt.png");
+	static Veng::GLTexture bulletTexture = Veng::ResourceManager::getTexture("Textures/Items/keyred.png"); //this is bad
+
 	_spriteBatch.draw(_player1.getPosAndSize(), _normUV, playerTexture.id, 0.0f, _colorWhite); // draw the player
 
 	int bulletsSize = _bullets.size();
 	for (int i = 0; i < bulletsSize; i++){
-		static Veng::GLTexture bulletTexture = Veng::ResourceManager::getTexture("Textures/Items/keyred.png"); //this is bad
 		_spriteBatch.draw(_bullets[i].getPosAndSize(), _normUV, bulletTexture.id, 0.0f, _colorWhite); // draw all bullets
 	}
 
@@ -220,4 +231,14 @@ void MainGame::drawGraphics(){
 	_colorProgram.unUse();
 
 	_window.swapBuffer();
+}
+
+template<typename T>
+void MainGame::moveObject(T& object, glm::vec2 direction){
+
+	object.move(direction);
+	if (_world.ableToMove(object.getPosition()) == false){
+		direction *= -1.0f;
+		object.move(direction);
+	}
 }
