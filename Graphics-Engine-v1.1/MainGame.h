@@ -49,6 +49,7 @@ private:
 
 	bool _bulletSpawnable;
 	std::vector<Bullet> _bullets;
+	void spawnBullet();
 
 	Veng::Window _window;
 	int _screenWidth;

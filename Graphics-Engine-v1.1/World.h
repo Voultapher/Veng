@@ -10,9 +10,11 @@ public:
 
 	void init(glm::vec4 boundry);
 
-	bool ableToMove(glm::vec4 posAndSize, glm::vec2 &direction);
+	bool outOfBound(glm::vec4 posAndSize, glm::vec2 &direction);
 
 private:
+	glm::vec2 safeVecAdd(glm::vec2 vecA, glm::vec2 vecB);
+
 	glm::vec2 _up;
 	glm::vec2 _down;
 	glm::vec2 _left;

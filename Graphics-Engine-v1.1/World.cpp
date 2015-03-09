@@ -19,25 +19,38 @@ void World::init(glm::vec4 boundry){
 
 }
 
-bool World::ableToMove(glm::vec4 posAndSize, glm::vec2 &direction){
+bool World::outOfBound(glm::vec4 posAndSize, glm::vec2 &direction){
+
 	if (posAndSize.y < _boundry.y){
-		direction = glm::normalize(direction + _up);
-		return false;
+		direction.y = -direction.y;
+		return true;
 	}
 
 	if ((posAndSize.y + posAndSize.w) > _boundry.w){
-		direction = glm::normalize(direction + _down);
-		return false;
+		direction.y = -direction.y;
+		return true;
 	}
 
 	if ((posAndSize.x + posAndSize.z) > _boundry.z){
-		direction = glm::normalize(direction + _left);
-		return false;
+		direction.x = -direction.x;
+		return true;
 	}
 
 	if (posAndSize.x < _boundry.x){
-		direction = glm::normalize(direction + _right);
-		return false;
+		direction.x = -direction.x;
+		return true;
 	}
-	return true;
+	return false;
+}
+
+glm::vec2 World::safeVecAdd(glm::vec2 vecA, glm::vec2 vecB){
+	glm::vec2 newVec = vecA + vecB;
+	if (newVec == glm::vec2(0.0f, 0.0f)){
+		newVec = vecB;
+	}
+	else{
+		newVec = glm::normalize(newVec);
+	}
+	
+	return newVec;
 }
