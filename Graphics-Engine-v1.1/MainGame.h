@@ -13,9 +13,11 @@
 #include <Veng/Camera2D.h>
 #include <Veng/SpriteBatch.h>
 #include <Veng/InputManager.h>
+#include <Veng/PhysicsManager.h>
+#include <Veng/ObjectPhysics2D.h>
 #include <Veng/Timing.h>
+#include <Veng/RandomEngine.h>
 
-#include <vector>
 #include <functional>
 
 #include "Bullet.h"
@@ -41,14 +43,17 @@ private:
 	void calculateFPS();
 
 	template<typename T>
-	void moveObject(T& object, glm::vec2 direction);
+	void moveObject(T* physicsObject, glm::vec2 direction);
+
+	template<typename T>
+	void deleteObject(std::vector<T*>& objectVec, int vecPosition);
 
 	World _world;
 
 	Player _player1;
 
 	bool _bulletSpawnable;
-	std::vector<Bullet> _bullets;
+	std::vector<Bullet*> _bullets;
 	void spawnBullet();
 
 	Veng::Window _window;
@@ -61,6 +66,8 @@ private:
 	Veng::SpriteBatch _spriteBatch;
 	Veng::InputManager _inputManager;
 	Veng::FpsLimiter _fpsLimiter;
+	Veng::PhysicsManager _physicsManager;
+	Veng::RandomEngine _random;
 
 	float _maxFPS;
 	float _fps;

@@ -2,7 +2,8 @@
 
 namespace Veng{
 
-ObjectPhysics2D::ObjectPhysics2D()
+	ObjectPhysics2D::ObjectPhysics2D() :
+	_dimension(2)
 {
 }
 
@@ -17,11 +18,23 @@ glm::vec4 ObjectPhysics2D::getPosAndSize(){
 	return _posAndSize;
 }
 
-void ObjectPhysics2D::init(glm::vec4 posAndSize, glm::vec2 direction, float speed){
+glm::vec4 ObjectPhysics2D::getPosAndBoundary(){
+	_posAndBoundary.x = _position.x;
+	_posAndBoundary.y = _position.y;
+	return _posAndBoundary;
+}
+
+void ObjectPhysics2D::init(glm::vec4 posAndSize, glm::vec2 direction, float mass, float speed, float boundaryScale){
 	_speed = speed;
+	_mass = mass;
 	_position = glm::vec2(posAndSize.x, posAndSize.y);
 	_direction = direction;
 	_posAndSize = posAndSize;
+
+	_boundray.x = posAndSize.z * boundaryScale;
+	_boundray.y = posAndSize.w * boundaryScale;
+	_posAndBoundary.z = _boundray.x;
+	_posAndBoundary.w = _boundray.y;
 }
 
 void ObjectPhysics2D::move(glm::vec2 direction){
@@ -30,6 +43,10 @@ void ObjectPhysics2D::move(glm::vec2 direction){
 
 void ObjectPhysics2D::setDirection(glm::vec2 direction){
 	_direction = direction;
+}
+
+void ObjectPhysics2D::setSpeed(float speed){
+	_speed = speed;
 }
 
 }

@@ -43,11 +43,12 @@ void MainGame::initSystems(){
 	_fpsLimiter.init(_maxFPS);
 
 	const glm::vec2 PLAYER_SPAWN(0.0f, 0.0f);
-	_player1.init(glm::vec4(PLAYER_SPAWN.x, PLAYER_SPAWN.y, 69.0f, 92.0f), PLAYER_SPAWN, 5.0f, 100.0f);
+	_player1.init(glm::vec4(PLAYER_SPAWN.x, PLAYER_SPAWN.y, 69.0f, 92.0f), glm::vec2(0.0f, 0.0f), 6348.0f, 5.0f, 0.8, 100.0f);
+	_physicsManager.addPhysicsObject(_player1.objectPhysics);
 
 	_colorWhite.setColor(255, 255, 255, 255);
 
-	const float WORLD_SIZE = 300.0f;
+	const float WORLD_SIZE = 400.0f;
 	_world.init(glm::vec4(-WORLD_SIZE, -WORLD_SIZE, WORLD_SIZE, WORLD_SIZE));
 }
 
@@ -67,16 +68,16 @@ void MainGame::gameLoop(){
 		_fpsLimiter.begin();
 
 		processInput();
-		_time += 0.05;
+		_time += 0.05f;
 
 		_camera.update();
+		_physicsManager.update();
 
 		int bulletsSize = _bullets.size();
 		for (int i = 0; i < bulletsSize;){ //update all bullets
-			moveObject(_bullets[i].objectPhysics, _bullets[i].objectPhysics.getDirection());
-			if (_bullets[i].update()){
-				_bullets[i] = _bullets.back();
-				_bullets.pop_back();
+			moveObject(_bullets[i]->objectPhysics, _bullets[i]->objectPhysics->getDirection());
+			if (_bullets[i]->update()){
+				deleteObject(_bullets, i);
 
 				bulletsSize--;
 			}
@@ -134,6 +135,7 @@ void MainGame::processInput(){
 		_gameState = GameState::EXIT;
 	}
 
+	_player1.objectPhysics->setSpeed(_player1.getMovementSpeed());
 	if (_inputManager.isKeyPressed(SDLK_w)){ // player movement
 		moveObject(_player1.objectPhysics, glm::vec2(0.0f, 1.0f));
 	}
@@ -149,6 +151,7 @@ void MainGame::processInput(){
 	if (_inputManager.isKeyPressed(SDLK_d)){
 		moveObject(_player1.objectPhysics, glm::vec2(1.0f, 0.0f));
 	}
+	_player1.objectPhysics->setSpeed(0.0f);
 
 	if (_inputManager.isKeyPressed(SDLK_UP)){ // camera movement
 		_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED) / _camera.getScale());
@@ -205,11 +208,11 @@ void MainGame::drawGraphics(){
 	static Veng::GLTexture playerTexture = Veng::ResourceManager::getTexture("Textures/Player/p1_hurt.png");
 	static Veng::GLTexture bulletTexture = Veng::ResourceManager::getTexture("Textures/Items/keyred.png"); //this is bad
 
-	_spriteBatch.draw(_player1.objectPhysics.getPosAndSize(), _normUV, playerTexture.id, 0.0f, _colorWhite); // draw the player
+	_spriteBatch.draw(_player1.objectPhysics->getPosAndSize(), _normUV, playerTexture.id, 0.0f, _colorWhite); // draw the player
 
 	int bulletsSize = _bullets.size();
 	for (int i = 0; i < bulletsSize; i++){
-		_spriteBatch.draw(_bullets[i].objectPhysics.getPosAndSize(), _normUV, bulletTexture.id, 0.0f, _colorWhite); // draw all bullets
+		_spriteBatch.draw(_bullets[i]->objectPhysics->getPosAndSize(), _normUV, bulletTexture.id, 0.0f, _colorWhite); // draw all bullets
 	}
 
 	_spriteBatch.end(); //
@@ -224,27 +227,47 @@ void MainGame::drawGraphics(){
 }
 
 template<typename T>
-void MainGame::moveObject(T& object, glm::vec2 direction){
+void MainGame::moveObject(T* physicsObject, glm::vec2 direction){
 
-	object.move(direction);
-	if (_world.outOfBound(object.getPosAndSize(), direction)){
-		object.setDirection(direction);
-		object.move(direction);
+	physicsObject->move(direction);
+
+	Veng::ObjectPhysics2D* collisionObject = _physicsManager.findIntersection(physicsObject);
+	if (collisionObject != nullptr){
+		_physicsManager.collide(physicsObject, collisionObject);
 	}
+
+	if (_world.outOfBound(physicsObject->getPosAndSize(), direction)){
+		physicsObject->setDirection(direction);
+		physicsObject->move(direction);
+	}
+}
+
+template<typename T>
+void MainGame::deleteObject(std::vector<T*>& objectVec, int vecPosition){
+
+	_physicsManager.deletePhysicsObject(objectVec[vecPosition]->objectPhysics);
+
+	objectVec[vecPosition] = objectVec.back();
+	objectVec.pop_back();
 }
 
 void MainGame::spawnBullet(){
 	glm::vec2 mousePosition = _inputManager.getMousePosition();
 	mousePosition = _camera.convertScreenToWorld(mousePosition);
 
-	glm::vec2 playerPosition = _player1.objectPhysics.getPosition();
+	// std::printf("Mouse: PosX: %f, PosY: %f\n", mousePosition.x, mousePosition.y);
+
+	glm::vec2 playerPosition = _player1.objectPhysics->getPosition();
 	glm::vec2 direction = mousePosition - playerPosition;
 	direction = glm::normalize(direction);
 
-	float bulletSize = 5.0f;
+	float bulletSize = 10.0f;//_random.generateRandomFloat(10.0f, 20.0f);
+	float lifeTime = 1000.0f;
+	float bulletMass = bulletSize * bulletSize;
+	float bulletSpeed = 8.0f;
 
-	_bullets.emplace_back(glm::vec4(playerPosition.x, playerPosition.y, bulletSize, bulletSize), direction, 8.0f, 300);
+	_bullets.emplace_back(new Bullet(glm::vec4(playerPosition.x - bulletSize, playerPosition.y - bulletSize, bulletSize, bulletSize), direction, bulletMass, bulletSpeed, 0.7, lifeTime));
 
-
-	//_bulletSpawnable = false;
+	_physicsManager.addPhysicsObject(_bullets.back()->objectPhysics);
+	_bulletSpawnable = false;
 }

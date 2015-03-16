@@ -1,8 +1,10 @@
 #include "Bullet.h"
 
-Bullet::Bullet(glm::vec4 posAndSize, glm::vec2 direction, float speed, int lifeTime)
+Bullet::Bullet(glm::vec4 posAndSize, glm::vec2 direction, float mass, float speed, float boundaryScale, int lifeTime)
 {
-	objectPhysics.init(posAndSize, direction, speed);
+	objectPhysics = new Veng::ObjectPhysics2D;
+	objectPhysics->init(posAndSize, direction, mass, speed, boundaryScale);
+
 	_lifeTime = lifeTime;
 	
 }
@@ -10,13 +12,14 @@ Bullet::Bullet(glm::vec4 posAndSize, glm::vec2 direction, float speed, int lifeT
 
 Bullet::~Bullet()
 {
+	delete objectPhysics;
 }
 
 
 bool Bullet::update(){
 	_lifeTime--;
 	if (_lifeTime == 0){
-		return true;
+		return true;// should be true only false for test
 	}
 	return false;
 }

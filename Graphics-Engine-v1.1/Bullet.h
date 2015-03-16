@@ -7,10 +7,10 @@
 class Bullet
 {
 public:
-	Bullet(glm::vec4 posAndSize, glm::vec2 direction, float speed, int lifeTime);
+	Bullet(glm::vec4 posAndSize, glm::vec2 direction, float mass, float speed, float boundaryScale, int lifeTime);
 	~Bullet();
 
-	Veng::ObjectPhysics2D objectPhysics;
+	Veng::ObjectPhysics2D* objectPhysics;
 
 	bool update(); // retuns true when lifeTime is 0
 

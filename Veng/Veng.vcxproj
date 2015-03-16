@@ -145,8 +145,10 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="IOManager.cpp" />
     <ClCompile Include="ObjectPhysics2D.cpp" />
+    <ClCompile Include="Physics2D.cpp" />
     <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="picoPNG.cpp" />
+    <ClCompile Include="RandomEngine.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteBatch.cpp" />
@@ -164,8 +166,10 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="IOManager.h" />
     <ClInclude Include="ObjectPhysics2D.h" />
+    <ClInclude Include="Physics2D.h" />
     <ClInclude Include="PhysicsManager.h" />
     <ClInclude Include="picoPNG.h" />
+    <ClInclude Include="RandomEngine.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteBatch.h" />
