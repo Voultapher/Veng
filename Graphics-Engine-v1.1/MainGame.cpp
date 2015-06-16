@@ -5,15 +5,16 @@
 #include "MainGame.h"
 #include <Veng/Errors.h>
 #include <Veng/ResourceManager.h>
+#include <Veng/PhysicsInitPackage2D.h>
 
-MainGame::MainGame() : 
-	_bulletSpawnable(true),
-	_screenWidth(1920),
-	_screenHeight(1080),
+MainGame::MainGame() :
+	_friction(0.94f),
+	_screenWidth(720),
+	_screenHeight(720),
 	_gameState(GameState::PLAY),
-	_maxFPS(90.0f),
+	_maxFPS(60.0f),
 	_time(0),
-	_vsyncFlag(Veng::VSYNC_ON),
+	_vsyncFlag(Veng::VSYNC_OFF),
 	_windowFlags(Veng::BORDERLESS),
 	_normUV(0.0f, 0.0f, 1.0f, 1.0f)
 {
@@ -42,14 +43,26 @@ void MainGame::initSystems(){
 	_spriteBatch.init();
 	_fpsLimiter.init(_maxFPS);
 
-	const glm::vec2 PLAYER_SPAWN(0.0f, 0.0f);
-	_player1.init(glm::vec4(PLAYER_SPAWN.x, PLAYER_SPAWN.y, 69.0f, 92.0f), glm::vec2(0.0f, 0.0f), 6348.0f, 5.0f, 0.8, 100.0f);
-	_physicsManager.addPhysicsObject(_player1.objectPhysics);
+	const glm::vec2 PLAYER_SPAWN(0.0f, 0.0f); // player init
+	const float PLAYER_SPEED = 1.0f;
+	Veng::PhysicsInitPackage2D player1InitPackage;
+	player1InitPackage.posAndSize = glm::vec4(PLAYER_SPAWN.x, PLAYER_SPAWN.y, 69.0f, 92.0f);
+	player1InitPackage.boundaryScale = 0.8f;
+	player1InitPackage.speed = glm::vec2(0.0f);
+	player1InitPackage.mass = 6348.0f;
+	player1InitPackage.friction = _friction;
+	_player1.init(100.0f, 0.8f);
+	_physicsManager.addPhysicsObject(_player1.objectPhysics, player1InitPackage);
 
 	_colorWhite.setColor(255, 255, 255, 255);
 
-	const float WORLD_SIZE = 400.0f;
+	const float WORLD_SIZE = 300.0f;
 	_world.init(glm::vec4(-WORLD_SIZE, -WORLD_SIZE, WORLD_SIZE, WORLD_SIZE));
+
+	_bulletSchedule.init(1);
+	_fpsSchedule.init(500);
+	_player1Schedule.init(100);
+	_sprinkleSchedule.init(200);
 }
 
 void MainGame::initShaders(){
@@ -61,51 +74,26 @@ void MainGame::initShaders(){
 }
 
 void MainGame::gameLoop(){
-	static int frameCounter = 0;
-
 	while (_gameState != GameState::EXIT){ // check for game states
-
-		_fpsLimiter.begin();
+		_fpsLimiter.begin(); // mesure frame time
 
 		processInput();
-		_time += 0.05f;
 
 		_camera.update();
 		_physicsManager.update();
-
-		int bulletsSize = _bullets.size();
-		for (int i = 0; i < bulletsSize;){ //update all bullets
-			moveObject(_bullets[i]->objectPhysics, _bullets[i]->objectPhysics->getDirection());
-			if (_bullets[i]->update()){
-				deleteObject(_bullets, i);
-
-				bulletsSize--;
-			}
-			else{
-				i++;
-			}
-		}
+		updateGameObjects();
 
 		drawGraphics();
 
-		_fps = _fpsLimiter.end();
-
-		frameCounter++;
-		if (frameCounter == 10){
+		_fps = _fpsLimiter.end(); // delay further calculations based on the target fps
+		if (_fpsSchedule.ready()){
 			printf("%.2f\n", _fps); // print fps only every 10 frames
-			frameCounter = 0;
-
-			_bulletSpawnable = true;
 		}
 	}
 }
 
 void MainGame::processInput(){
 	SDL_Event evnt;
-
-	const float CAMERA_SPEED = 10.0f;
-	const float SCALE_SPEED = 1.02f;
-	const float MIN_SCALE = 0.1f;
 
 	while (SDL_PollEvent(&evnt)){
 		switch (evnt.type){
@@ -135,23 +123,47 @@ void MainGame::processInput(){
 		_gameState = GameState::EXIT;
 	}
 
-	_player1.objectPhysics->setSpeed(_player1.getMovementSpeed());
+	playerMovement();
+	camaraMovement();
+
+	if (_inputManager.isKeyPressed(SDL_BUTTON_LEFT)){ // spawn bullets
+		if (_bulletSchedule.ready()){
+			//madness();
+			sprinkle();
+		}
+	}
+}
+
+void MainGame::playerMovement(){
+	bool w = false, s = false, a = false, d = false;
 	if (_inputManager.isKeyPressed(SDLK_w)){ // player movement
-		moveObject(_player1.objectPhysics, glm::vec2(0.0f, 1.0f));
+		w = true;
+		_player1.objectPhysics->addAcceleration(glm::vec2(0.0f, 1.0f) * _player1.getMovementSpeed());
 	}
 
 	if (_inputManager.isKeyPressed(SDLK_s)){
-		moveObject(_player1.objectPhysics, glm::vec2(0.0f, -1.0f));
+		s = true;
+		_player1.objectPhysics->addAcceleration(glm::vec2(0.0f, -1.0f) * _player1.getMovementSpeed());
 	}
 
 	if (_inputManager.isKeyPressed(SDLK_a)){
-		moveObject(_player1.objectPhysics, glm::vec2(-1.0f, 0.0f));
+		a = true;
+		_player1.objectPhysics->addAcceleration(glm::vec2(-1.0f, 0.0f) * _player1.getMovementSpeed());
 	}
 
 	if (_inputManager.isKeyPressed(SDLK_d)){
-		moveObject(_player1.objectPhysics, glm::vec2(1.0f, 0.0f));
+		d = true;
+		_player1.objectPhysics->addAcceleration(glm::vec2(1.0f, 0.0f) * _player1.getMovementSpeed());
 	}
-	_player1.objectPhysics->setSpeed(0.0f);
+
+	if (w || s || a || d){
+	}
+}
+
+void MainGame::camaraMovement(){
+	const float CAMERA_SPEED = 10.0f;
+	const float SCALE_SPEED = 1.02f;
+	const float MIN_SCALE = 0.1f;
 
 	if (_inputManager.isKeyPressed(SDLK_UP)){ // camera movement
 		_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED) / _camera.getScale());
@@ -178,23 +190,36 @@ void MainGame::processInput(){
 			_camera.setScale(_camera.getScale() / SCALE_SPEED);
 		}
 	}
+}
 
-	if (_inputManager.isKeyPressed(SDL_BUTTON_LEFT)){ // spawn bullets
-		if (_bulletSpawnable){
-			spawnBullet();
+void MainGame::updateGameObjects(){
+
+	for (int i = 0; i < _bullets.size(); i++){ //update all bullets game logic
+		if (_world.outOfBound(_bullets[i]->objectPhysics->getPosAndBoundary())){ // checks if this game object is out of bounds of the game world //tmp to be replaced by a unified gameobject system
+			_bullets[i]->objectPhysics->pushBackAndStop();
 		}
+
+		if (_bullets[i]->update()){
+			_physicsManager.deleteObject(_bullets[i]->objectPhysics);
+			_bullets[i] = _bullets.back();
+			_bullets.pop_back();
+		}
+	}
+
+	if (_world.outOfBound(_player1.objectPhysics->getPosAndBoundary())){
+		_player1.objectPhysics->pushBackAndStop();
 	}
 }
 
 void MainGame::drawGraphics(){
 
-	glClearDepth(1.0);
+	glClearDepth(1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	_colorProgram.use();
 	glActiveTexture(GL_TEXTURE0);
 	GLint textureLocation = _colorProgram.getUniformLocation("mySampler");
-	glUniform1f(textureLocation, 0); // ben says 1i but I think thats false
+	glUniform1i(textureLocation, 0); // ben says 1i but I think thats false
 
 	//GLint timeLocation = _colorProgram.getUniformLocation("time");
 	//glUniform1f(timeLocation, _time); //set time variable
@@ -212,10 +237,11 @@ void MainGame::drawGraphics(){
 
 	int bulletsSize = _bullets.size();
 	for (int i = 0; i < bulletsSize; i++){
-		_spriteBatch.draw(_bullets[i]->objectPhysics->getPosAndSize(), _normUV, bulletTexture.id, 0.0f, _colorWhite); // draw all bullets
+		Veng::Color bulletColor = speedColor(_bullets[i]->objectPhysics->getSpeedMagnitude(), 5.0f);
+		_spriteBatch.draw(_bullets[i]->objectPhysics->getPosAndSize(), _normUV, bulletTexture.id, 0.0f, bulletColor); // draw all bullets
 	}
 
-	_spriteBatch.end(); //
+	_spriteBatch.end();
 
 	_spriteBatch.renderBatches();
 
@@ -226,48 +252,54 @@ void MainGame::drawGraphics(){
 	_window.swapBuffer();
 }
 
-template<typename T>
-void MainGame::moveObject(T* physicsObject, glm::vec2 direction){
+void MainGame::spawnBullet(glm::vec2 position, glm::vec2 force){
+	float lifeTime = 1000.0f;
 
-	physicsObject->move(direction);
-
-	Veng::ObjectPhysics2D* collisionObject = _physicsManager.findIntersection(physicsObject);
-	if (collisionObject != nullptr){
-		_physicsManager.collide(physicsObject, collisionObject);
-	}
-
-	if (_world.outOfBound(physicsObject->getPosAndSize(), direction)){
-		physicsObject->setDirection(direction);
-		physicsObject->move(direction);
-	}
-}
-
-template<typename T>
-void MainGame::deleteObject(std::vector<T*>& objectVec, int vecPosition){
-
-	_physicsManager.deletePhysicsObject(objectVec[vecPosition]->objectPhysics);
-
-	objectVec[vecPosition] = objectVec.back();
-	objectVec.pop_back();
-}
-
-void MainGame::spawnBullet(){
 	glm::vec2 mousePosition = _inputManager.getMousePosition();
 	mousePosition = _camera.convertScreenToWorld(mousePosition);
 
-	// std::printf("Mouse: PosX: %f, PosY: %f\n", mousePosition.x, mousePosition.y);
+	Veng::PhysicsInitPackage2D bulletInitPackage;
+	float bulletSize = 20.0f;//_random.generateRandomFloat(15.0f, 25.0f);
+	bulletInitPackage.mass = bulletSize * bulletSize * 10;
+	bulletInitPackage.speed = glm::vec2(0.0f);
+	bulletInitPackage.posAndSize = glm::vec4(position.x, position.y, bulletSize, bulletSize); //tmp
+	//bulletInitPackage.posAndSize = glm::vec4(0.0f, 0.0f, bulletSize, bulletSize); //tmp
+	//bulletInitPackage.posAndSize = glm::vec4(playerPosition.x - bulletSize, playerPosition.y - bulletSize, bulletSize, bulletSize);
+	bulletInitPackage.boundaryScale = 0.7;
+	bulletInitPackage.friction = 0.97f;// _friction;
 
-	glm::vec2 playerPosition = _player1.objectPhysics->getPosition();
-	glm::vec2 direction = mousePosition - playerPosition;
-	direction = glm::normalize(direction);
+	_bullets.emplace_back(new Bullet(lifeTime));
+	_physicsManager.addPhysicsObject(_bullets.back()->objectPhysics, bulletInitPackage);
 
-	float bulletSize = 10.0f;//_random.generateRandomFloat(10.0f, 20.0f);
-	float lifeTime = 1000.0f;
-	float bulletMass = bulletSize * bulletSize;
-	float bulletSpeed = 8.0f;
+	_bullets.back()->objectPhysics->applyForce(force);
+}
 
-	_bullets.emplace_back(new Bullet(glm::vec4(playerPosition.x - bulletSize, playerPosition.y - bulletSize, bulletSize, bulletSize), direction, bulletMass, bulletSpeed, 0.7, lifeTime));
+void MainGame::madness(){
+	int bullets = 1000;
+	for (int i = 0; i < bullets; i++){
+		float x = _random.generateRandomFloat(-_world.getSize(), _world.getSize());
+		float y = _random.generateRandomFloat(-_world.getSize(), _world.getSize());
+		glm::vec2 position(x, y);
+		glm::vec2 force(0.0f);
+		spawnBullet(position, force);
+	}
+}
 
-	_physicsManager.addPhysicsObject(_bullets.back()->objectPhysics);
-	_bulletSpawnable = false;
+void MainGame::sprinkle(){
+	if (_sprinkleSchedule.ready()){
+		float x = _random.generateRandomFloat(-0.5, 0.5);
+		glm::vec2 position( _camera.convertScreenToWorld(_inputManager.getMousePosition()) );
+		glm::vec2 force(x, -40000.0f);
+		spawnBullet(position, force);
+	}
+}
+
+Veng::Color MainGame::speedColor(float speed, float max){
+	Veng::Color sC;
+	//sC.r = std::tanh(speed/max) * 250;
+	sC.r = 250;
+	sC.g = 100;
+	sC.b = 200;
+	sC.a = 255; 
+	return sC;
 }

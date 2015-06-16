@@ -20,14 +20,11 @@ public:
 
 	void update();
 
-	ObjectPhysics2D* findIntersection(ObjectPhysics2D* physicsObject);
-
-	void collide(ObjectPhysics2D* objectA, ObjectPhysics2D* objectB);
-
 private:
 	std::vector<ObjectPhysics2D*> _physicsObjects;
 
-	void collideA(ObjectPhysics2D* objectA, ObjectPhysics2D* objectB, glm::vec2 newMomentum);
+	std::vector<Veng::ObjectPhysics2D* > findIntersection(ObjectPhysics2D* physicsObject);
+	void collide(ObjectPhysics2D* objectA, std::vector<Veng::ObjectPhysics2D* > collisionGroup);
 };
 
 }

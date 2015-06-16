@@ -10,7 +10,7 @@ public:
 	Player();
 	~Player();
 
-	void init(glm::vec4 posAndSize, glm::vec2 direction, float mass, float speed, float boundaryScale, float life);
+	void init(float life, float movementSpeed);
 
 	Veng::ObjectPhysics2D* objectPhysics;
 

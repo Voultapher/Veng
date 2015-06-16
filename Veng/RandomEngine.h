@@ -12,10 +12,12 @@ public:
 	RandomEngine();
 	~RandomEngine();
 
+	void init(int seed = 2167);
+
 	float generateRandomFloat(float lowerBound, float upperBound);
 
 private:
-	//std::default_random_engine _randomGenerator();
+	int _seed;
 };
 
 }

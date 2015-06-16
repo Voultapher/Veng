@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <map>
+#include <string>
 
 #include <SDL/SDL.h>
 #include <GL/glew.h>
@@ -17,6 +19,7 @@
 #include <Veng/ObjectPhysics2D.h>
 #include <Veng/Timing.h>
 #include <Veng/RandomEngine.h>
+#include <Veng/Schedule.h>
 
 #include <functional>
 
@@ -39,22 +42,25 @@ private:
 	void initShaders();
 	void gameLoop();
 	void processInput();
+	void playerMovement();
+	void camaraMovement();
 	void drawGraphics();
-	void calculateFPS();
-
-	template<typename T>
-	void moveObject(T* physicsObject, glm::vec2 direction);
-
-	template<typename T>
-	void deleteObject(std::vector<T*>& objectVec, int vecPosition);
+	void updateGameObjects();
+	Veng::Color speedColor(float speed, float max);
 
 	World _world;
 
 	Player _player1;
+	Veng::Schedule _player1Schedule;
 
-	bool _bulletSpawnable;
 	std::vector<Bullet*> _bullets;
-	void spawnBullet();
+	void spawnBullet(glm::vec2 position, glm::vec2 force);
+	Veng::Schedule _bulletSchedule;
+	void madness();
+	void sprinkle();
+	Veng::Schedule _sprinkleSchedule;
+
+	float _friction;
 
 	Veng::Window _window;
 	int _screenWidth;
@@ -66,6 +72,7 @@ private:
 	Veng::SpriteBatch _spriteBatch;
 	Veng::InputManager _inputManager;
 	Veng::FpsLimiter _fpsLimiter;
+	Veng::Schedule _fpsSchedule;
 	Veng::PhysicsManager _physicsManager;
 	Veng::RandomEngine _random;
 

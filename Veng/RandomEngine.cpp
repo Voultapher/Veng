@@ -2,8 +2,9 @@
 
 namespace Veng{
 
-RandomEngine::RandomEngine()
+	RandomEngine::RandomEngine()
 {
+		init();
 }
 
 
@@ -11,10 +12,14 @@ RandomEngine::~RandomEngine()
 {
 }
 
-float RandomEngine::generateRandomFloat(float lowerBound, float upperBound){
-	std::default_random_engine randomGenerator(SDL_GetTicks());
+void RandomEngine::init(int seed){
+	_seed = seed;
+}
 
-	std::uniform_real_distribution<float> randomFloat(lowerBound, upperBound);
+float RandomEngine::generateRandomFloat(float lowerBound, float upperBound){
+	static std::default_random_engine randomGenerator(_seed);
+	static std::uniform_real_distribution<float> randomFloat(lowerBound, upperBound);
+
 	return randomFloat(randomGenerator);
 }
 

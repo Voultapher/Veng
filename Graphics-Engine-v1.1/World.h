@@ -10,15 +10,16 @@ public:
 
 	void init(glm::vec4 boundry);
 
-	bool outOfBound(glm::vec4 posAndSize, glm::vec2 &direction);
+	bool outOfBound(glm::vec4 posAndSize);
+	float getSize() const { return _worldsize; }
 
 private:
-	glm::vec2 safeVecAdd(glm::vec2 vecA, glm::vec2 vecB);
 
+	float _worldsize;
 	glm::vec2 _up;
 	glm::vec2 _down;
 	glm::vec2 _left;
 	glm::vec2 _right;
-	glm::vec4 _boundry;
+	glm::vec4 _boundary;
 };
 

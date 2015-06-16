@@ -21,123 +21,70 @@ void Physics2D::addObject(ObjectPhysics2D* physicsObject){
 }
 
 void Physics2D::deleteObject(ObjectPhysics2D* physicsObject){ // bad O(n)
-	int physicsObjectsSize = _physicsObjects.size();
-
-	for (int i = 0; i < physicsObjectsSize; i++){
+	for (int i = 0; i < _physicsObjects.size(); i++){
 		if (physicsObject == _physicsObjects[i]){
 			_physicsObjects[i] = _physicsObjects.back();
 			_physicsObjects.pop_back();
-			physicsObjectsSize--;
 		}
 	}
 }
 
 void Physics2D::update(){
 
-	int physicsObjectsSize = _physicsObjects.size();
+	for (auto& physicsObject : _physicsObjects){ // first move every object without considering collision, to achieve move certainty
+			physicsObject->move();
+	}
 
+	for (auto& physicsObject : _physicsObjects){ // unlock every object for the next iteration
+		if (physicsObject->isLocked() == false){
+			std::vector<Veng::ObjectPhysics2D* > intersectingObjects = findIntersection(physicsObject);
+			if (intersectingObjects.size() > 0){
+				collide(physicsObject, intersectingObjects);
+			}
+		}
+	}
+
+	for (auto& physicsObject : _physicsObjects){
+		physicsObject->unLock();
+	}
 }
 
-ObjectPhysics2D* Physics2D::findIntersection(ObjectPhysics2D* physicsObject){ // naive implementation O(n^2)
+std::vector<Veng::ObjectPhysics2D* > Physics2D::findIntersection(ObjectPhysics2D* physicsObject){ // naive implementation O(n^2)
 	glm::vec4 posAndSize = physicsObject->getPosAndBoundary();
+	std::vector<Veng::ObjectPhysics2D* > intersectingObjects;
 
 	int physicsObjectsSize = _physicsObjects.size();
 
 	for (int i = 0; i < physicsObjectsSize; i++){
-		glm::vec4 posAndSizeNearX = _physicsObjects[i]->getPosAndBoundary();
-		if ( (posAndSize.x > posAndSizeNearX.x && (posAndSize.x < (posAndSizeNearX.x + posAndSizeNearX.z)))
-			|| ((posAndSize.x + posAndSize.z) > posAndSizeNearX.x && ((posAndSize.x + posAndSize.z) < (posAndSizeNearX.x + posAndSizeNearX.z))) ){
-			//glm::vec4 posAndSizeNearY = _physicsObjects[i]->getPosAndBoundary();
-				if ( (posAndSize.y > posAndSizeNearX.y && posAndSize.y < (posAndSizeNearX.y + posAndSizeNearX.w))
-					|| ((posAndSize.y + posAndSize.w)> posAndSizeNearX.y && (posAndSize.y + posAndSize.w) < (posAndSizeNearX.y + posAndSizeNearX.w)) ){
-						return _physicsObjects[i];
-					}
-			}
-	}
-
-	return nullptr;
-}
-
-/*ObjectPhysics2D* Physics2D::findIntersection(ObjectPhysics2D* physicsObject){
-	bool xFit = false;
-	bool yFit = false;
-	bool sameObject = false;
-	glm::vec4 posAndSize = physicsObject->getPosAndSize();
-
-	auto mitX = _posX.lower_bound(posAndSize.x);
-
-	if (mitX == _posX.end()){
-		return nullptr;
-	}
-	
-	glm::vec4 posAndSizeNearX = mitX->second->getPosAndSize();
-	if (posAndSize.x > posAndSizeNearX.x && (posAndSize.x < (posAndSizeNearX.x + posAndSizeNearX.z))){
-		xFit = true;
-
-		auto mitY = _posY.lower_bound(posAndSize.y);
-
-		if (mitY == _posY.end()){
-			return nullptr; // nsir
-		}
-
-		glm::vec4 posAndSizeNearY = mitY->second->getPosAndSize();
-		if (posAndSize.y > posAndSizeNearY.y && posAndSize.y < (posAndSizeNearY.y + posAndSizeNearY.w)){
-			yFit = true;
-
-			if (mitX == mitY){
-				sameObject = true;
+		if (_physicsObjects[i] != physicsObject){ // prevents finding itself
+			glm::vec4 posAndSizeNearX = _physicsObjects[i]->getPosAndBoundary();
+			if ((posAndSize.x > posAndSizeNearX.x && (posAndSize.x < (posAndSizeNearX.x + posAndSizeNearX.z)))
+				|| ((posAndSize.x + posAndSize.z) > posAndSizeNearX.x && ((posAndSize.x + posAndSize.z) < (posAndSizeNearX.x + posAndSizeNearX.z)))){
+				if ((posAndSize.y > posAndSizeNearX.y && posAndSize.y < (posAndSizeNearX.y + posAndSizeNearX.w))
+					|| ((posAndSize.y + posAndSize.w)> posAndSizeNearX.y && (posAndSize.y + posAndSize.w) < (posAndSizeNearX.y + posAndSizeNearX.w))){
+					intersectingObjects.push_back(_physicsObjects[i]);
+				}
 			}
 		}
 	}
 
-	if (xFit && yFit){ // set of conditions for positive collision
-		if (sameObject){
-			return mitX->second;
-		}
-	}
-
-	return nullptr;
-
-}*/
-
-void Physics2D::collide(ObjectPhysics2D* objectA, ObjectPhysics2D* objectB){
-	// calculate impuls mass * speed and add those vec wise
-
-
-	glm::vec2 newMomentumA = objectB->getMomentum() - objectA->getMomentum();
-	glm::vec2 newMomentumB = objectA->getMomentum() - objectB->getMomentum();
-
-	collideA(objectA, objectB, newMomentumA);
-	collideA(objectB, objectA, newMomentumB);
-	
+	return intersectingObjects;
 }
 
-void Physics2D::collideA(ObjectPhysics2D* objectA, ObjectPhysics2D* objectB, glm::vec2 newMomentum){
-	glm::vec2 newDirectionA;
-	glm::vec2 newDirectionB;
+void Physics2D::collide(ObjectPhysics2D* objectA, std::vector<Veng::ObjectPhysics2D* > collisionGroup){
 
-	if (objectA->getSpeed() != 0.0f && objectB->getSpeed() != 0.0f){
-
-		newDirectionA = glm::normalize(newMomentum / (objectA->getSpeed() * objectA->getMass()));
-
-		objectA->setDirection(newDirectionA);
-
-		objectA->move(newDirectionA);
+	objectA->pushBack();
+	for (auto& collisionObject : collisionGroup){ // undo this cycles movement as it caused an intersection
+		collisionObject->pushBack();
 	}
 
-	else{
-		if (objectA->getSpeed() != 0.0f){
-			newDirectionA = -objectA->getDirection();
-			objectA->setDirection(newDirectionA);
-			objectA->move(newDirectionA);
-		}
-		else{
-			float newSpeedA = objectB->getSpeed() * (objectB->getMass() / objectA->getMass());
-			objectA->setSpeed(newSpeedA);
-			objectA->move(-objectB->getDirection());
-			objectA->setSpeed(0.0f);
-		}
+	glm::vec2 objectAMomentum(glm::vec2(objectA->getMomentum().x / collisionGroup.size(), objectA->getMomentum().y / collisionGroup.size()));
+	objectA->setSpeed(((2.0f * (objectA->getMomentum() + collisionGroup[0]->getMomentum())) / (objectA->getMass() + collisionGroup[0]->getMass())) - objectA->getSpeed());
+
+	for (auto& collisionObject : collisionGroup){
+		collisionObject->setSpeed(((2.0f * (objectAMomentum + collisionObject->getMomentum())) / (objectA->getMass() + collisionObject->getMass())) - collisionObject->getSpeed());
+		collisionObject->lock(); // every object in a collision can only collide once per cycle
 	}
+	objectA->lock();
 }
-
 }
