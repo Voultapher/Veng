@@ -5,7 +5,8 @@ namespace Veng{
 ObjectPhysics2D::ObjectPhysics2D() :
 	_locked(false),
 	_dimension(2),
-	_acceleration(0.0f)
+	_acceleration(0.0f),
+	_lowerSpeedTreshold(1e-5f)
 {
 }
 
@@ -58,18 +59,32 @@ void ObjectPhysics2D::move(){
 	_acceleration = glm::vec2(0.0f);
 
 	_speed *= _friction;
-
 	_position += _speed;
+
 }
 
-void ObjectPhysics2D::pushBack(){
+void ObjectPhysics2D::undoMovement(){
 	_position -= _speed;
+}
+
+void ObjectPhysics2D::pushBack(){ // causes corner Problems
+	_position -= glm::vec2(_posAndSize.z / 50.0f, _posAndSize.w / 50.0f);
 }
 
 void ObjectPhysics2D::pushBackAndStop(){
 	_position -= _speed;
 	_speed = glm::vec2(0.0f);
 	_acceleration = glm::vec2(0.0f);
+}
+
+void ObjectPhysics2D::suckToCenter(){ // causes center problems
+	_position.x *= 0.98f;
+	_position.y *= 0.98f;
+}
+
+void ObjectPhysics2D::pushOut(){ // causes center problems
+	_position.x *= 1.02f;
+	_position.y *= 1.02f;
 }
 
 void ObjectPhysics2D::lock(){
@@ -98,6 +113,10 @@ void ObjectPhysics2D::setSpeed(glm::vec2 speed){
 
 void ObjectPhysics2D::setSpeedZero(){
 	_speed = glm::vec2(0.0f);
+}
+
+void ObjectPhysics2D::setPosition(glm::vec2 position){
+	_position = position;
 }
 
 }

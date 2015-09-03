@@ -18,13 +18,17 @@ public:
 	void setAcceleration(glm::vec2 acceleration);
 	void addAcceleration(glm::vec2 acceleration);
 	void applyForce(glm::vec2 force);
+	void undoMovement();
 	void pushBack();
 	void pushBackAndStop();
+	void suckToCenter();
+	void pushOut();
 	void lock();
 	void unLock();
 
 	void setSpeed(glm::vec2 speed);
 	void setSpeedZero();
+	void setPosition(glm::vec2 position);
 
 	bool isLocked() const { return _locked; }
 	int getDimension() const { return _dimension; }
@@ -47,6 +51,7 @@ private:
 	float _maxSpeed;
 	float _mass;
 	float _friction;
+	float _lowerSpeedTreshold;
 
 	glm::vec2 _position;
 	glm::vec4 _posAndSize;

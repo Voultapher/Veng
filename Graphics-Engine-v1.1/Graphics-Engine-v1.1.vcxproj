@@ -133,6 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
+    <ClInclude Include="GameObjects.h" />
     <ClInclude Include="MainGame.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="World.h" />

@@ -24,9 +24,9 @@ void FpsLimiter::begin(){
 float FpsLimiter::end(){ // end will return the current fps
 	calculateFPS();
 
-	float frameTicks = ((SDL_GetTicks()) - _startTicks) - 1.0f; // the -1 makes that it stays below the maxFps
-	if (1000.0f / _maxFps > frameTicks){
-		SDL_Delay((1000.0f / _maxFps) - frameTicks);
+	_frameTicks = ((SDL_GetTicks()) - _startTicks) - 1.0f; // the -1 makes that it stays below the maxFps
+	if (1000.0f / _maxFps > _frameTicks){
+		SDL_Delay((1000.0f / _maxFps) - _frameTicks);
 	}
 
 	return _fps;

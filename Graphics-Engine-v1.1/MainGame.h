@@ -23,6 +23,7 @@
 
 #include <functional>
 
+#include "GameObjects.h"
 #include "Bullet.h"
 #include "Player.h"
 #include "World.h"
@@ -50,14 +51,15 @@ private:
 
 	World _world;
 
-	Player _player1;
+	GameObjects _gameObjects;
 	Veng::Schedule _player1Schedule;
 
-	std::vector<Bullet*> _bullets;
 	void spawnBullet(glm::vec2 position, glm::vec2 force);
 	Veng::Schedule _bulletSchedule;
 	void madness();
 	void sprinkle();
+	void revert();
+	void still();
 	Veng::Schedule _sprinkleSchedule;
 
 	float _friction;
@@ -78,6 +80,8 @@ private:
 
 	float _maxFPS;
 	float _fps;
+	float _frameTime;
+	float _frameTicks;
 
 	float _time;
 	Veng::Vsync _vsyncFlag;

@@ -12,6 +12,8 @@ public:
 	void begin();
 
 	float end(); // end will return the current fps
+	float getFrameTime() const { return _frameTime; }
+	float getFramTicks() const { return _frameTicks; } // time spent working, without fps limit delay
 
 private:
 	void calculateFPS();
@@ -19,6 +21,7 @@ private:
 	float _maxFps;
 	float _fps;
 	float _frameTime;
+	float _frameTicks; // time spent working, without fps limit delay
 
 	unsigned int _startTicks;
 };

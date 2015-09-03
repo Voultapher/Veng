@@ -2,6 +2,8 @@
 
 #include <cstdlib>
 
+#include "Errors.h"
+
 namespace Veng{
 
 Physics2D::Physics2D()
@@ -71,19 +73,55 @@ std::vector<Veng::ObjectPhysics2D* > Physics2D::findIntersection(ObjectPhysics2D
 	return intersectingObjects;
 }
 
-void Physics2D::collide(ObjectPhysics2D* objectA, std::vector<Veng::ObjectPhysics2D* > collisionGroup){
+bool Physics2D::twoObjectIntersection(ObjectPhysics2D* physicsObjectA, ObjectPhysics2D* physicsObjectB){
+	glm::vec4 posAndSize = physicsObjectA->getPosAndBoundary();
+	glm::vec4 posAndSizeNearX = physicsObjectB->getPosAndBoundary();
+	if ((posAndSize.x > posAndSizeNearX.x && (posAndSize.x < (posAndSizeNearX.x + posAndSizeNearX.z)))
+		|| ((posAndSize.x + posAndSize.z) > posAndSizeNearX.x && ((posAndSize.x + posAndSize.z) < (posAndSizeNearX.x + posAndSizeNearX.z)))){
+		if ((posAndSize.y > posAndSizeNearX.y && posAndSize.y < (posAndSizeNearX.y + posAndSizeNearX.w))
+			|| ((posAndSize.y + posAndSize.w)> posAndSizeNearX.y && (posAndSize.y + posAndSize.w) < (posAndSizeNearX.y + posAndSizeNearX.w))){
+			return true;
+		}
+	}
+	return false;
+}
 
-	objectA->pushBack();
+void Physics2D::collide(ObjectPhysics2D* objectA, std::vector<Veng::ObjectPhysics2D* > collisionGroup){
+	objectA->undoMovement();
 	for (auto& collisionObject : collisionGroup){ // undo this cycles movement as it caused an intersection
-		collisionObject->pushBack();
+		collisionObject->undoMovement();
+		int runCounter(0);
+		int runMax(10);
+		while (true){ // no longer easy determistic run time
+			runCounter++;
+			if (twoObjectIntersection(objectA, collisionObject)){
+				collisionObject->suckToCenter();
+				objectA->pushOut();
+			}
+			else{
+				break;
+			}
+			if (runCounter == runMax){
+				objectA->setPosition(glm::vec2(objectA->getPosition().x + collisionObject->getPosAndBoundary().w, objectA->getPosition().y - collisionObject->getPosAndBoundary().z)); // allthogh working this is not recommended
+				break;
+			}
+		}
 	}
 
-	glm::vec2 objectAMomentum(glm::vec2(objectA->getMomentum().x / collisionGroup.size(), objectA->getMomentum().y / collisionGroup.size()));
-	objectA->setSpeed(((2.0f * (objectA->getMomentum() + collisionGroup[0]->getMomentum())) / (objectA->getMass() + collisionGroup[0]->getMass())) - objectA->getSpeed());
+	if (collisionGroup.size() > 1){
+		glm::vec2 objectAMomentum(glm::vec2(objectA->getMomentum().x / collisionGroup.size(), objectA->getMomentum().y / collisionGroup.size()));
+		objectA->setSpeed(((2.0f * (objectA->getMomentum() + collisionGroup[0]->getMomentum())) / (objectA->getMass() + collisionGroup[0]->getMass())) - objectA->getSpeed());
 
-	for (auto& collisionObject : collisionGroup){
-		collisionObject->setSpeed(((2.0f * (objectAMomentum + collisionObject->getMomentum())) / (objectA->getMass() + collisionObject->getMass())) - collisionObject->getSpeed());
-		collisionObject->lock(); // every object in a collision can only collide once per cycle
+		for (auto& collisionObject : collisionGroup){
+			collisionObject->setSpeed(((2.0f * (objectAMomentum + collisionObject->getMomentum())) / (objectA->getMass() + collisionObject->getMass())) - collisionObject->getSpeed());
+			collisionObject->lock(); // every object in a collision can only collide once per cycle
+		}
+	}
+	else{
+		glm::vec2 objectAMomentum(objectA->getMomentum());
+		objectA->setSpeed(((2.0f * (objectA->getMomentum() + collisionGroup[0]->getMomentum())) / (objectA->getMass() + collisionGroup[0]->getMass())) - objectA->getSpeed());
+		collisionGroup[0]->setSpeed(((2.0f * (objectAMomentum + collisionGroup[0]->getMomentum())) / (objectA->getMass() + collisionGroup[0]->getMass())) - collisionGroup[0]->getSpeed());
+		collisionGroup[0]->lock();
 	}
 	objectA->lock();
 }
