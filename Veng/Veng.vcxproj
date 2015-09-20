@@ -161,6 +161,7 @@
     <ClCompile Include="Timing.cpp" />
     <ClCompile Include="Veng.cpp" />
     <ClCompile Include="Window.cpp" />
+    <ClCompile Include="Zone2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera2D.h" />
@@ -185,6 +186,7 @@
     <ClInclude Include="Veng.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
+    <ClInclude Include="Zone2D.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

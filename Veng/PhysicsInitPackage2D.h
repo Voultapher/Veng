@@ -11,6 +11,7 @@ namespace Veng{
 		glm::vec2 speed;
 		float boundaryScale;
 		float friction;
+		bool stationanry = false; // make sure not to spawn a staionary object inside another object
 	};
 
 }

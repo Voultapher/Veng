@@ -45,6 +45,7 @@ public:
 
 private:
 	bool _locked;
+	bool _stationary;
 	int _dimension;
 	glm::vec2 _acceleration;
 	glm::vec2 _speed;

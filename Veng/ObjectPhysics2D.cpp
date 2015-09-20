@@ -43,6 +43,8 @@ void ObjectPhysics2D::init(PhysicsInitPackage2D& initPackage){
 	_posAndBoundary.w = _boundray.y;
 
 	_friction = initPackage.friction;
+
+	_stationary = initPackage.stationanry;
 }
 
 float ObjectPhysics2D::getSpeedMagnitude(){
@@ -54,37 +56,48 @@ float ObjectPhysics2D::getSpeedMagnitude(){
 }
 
 void ObjectPhysics2D::move(){
+	if (_stationary == false){
+		_speed += _acceleration;
+		_acceleration = glm::vec2(0.0f);
 
-	_speed += _acceleration;
-	_acceleration = glm::vec2(0.0f);
-
-	_speed *= _friction;
-	_position += _speed;
+		_speed *= _friction;
+		_position += _speed;
+	}
 
 }
 
 void ObjectPhysics2D::undoMovement(){
-	_position -= _speed;
+	if (_stationary == false){
+		_position -= _speed;
+	}
 }
 
 void ObjectPhysics2D::pushBack(){ // causes corner Problems
-	_position -= glm::vec2(_posAndSize.z / 50.0f, _posAndSize.w / 50.0f);
+	if (_stationary == false){
+		_position -= glm::vec2(_posAndSize.z / 50.0f, _posAndSize.w / 50.0f);
+	}
 }
 
 void ObjectPhysics2D::pushBackAndStop(){
-	_position -= _speed;
-	_speed = glm::vec2(0.0f);
-	_acceleration = glm::vec2(0.0f);
+	if (_stationary == false){
+		_position -= _speed;
+		_speed = glm::vec2(0.0f);
+		_acceleration = glm::vec2(0.0f);
+	}
 }
 
 void ObjectPhysics2D::suckToCenter(){ // causes center problems
-	_position.x *= 0.98f;
-	_position.y *= 0.98f;
+	if (_stationary == false){
+		_position.x *= 0.98f;
+		_position.y *= 0.98f;
+	}
 }
 
 void ObjectPhysics2D::pushOut(){ // causes center problems
-	_position.x *= 1.02f;
-	_position.y *= 1.02f;
+	if (_stationary == false){
+		_position.x *= 1.02f;
+		_position.y *= 1.02f;
+	}
 }
 
 void ObjectPhysics2D::lock(){
@@ -116,7 +129,9 @@ void ObjectPhysics2D::setSpeedZero(){
 }
 
 void ObjectPhysics2D::setPosition(glm::vec2 position){
-	_position = position;
+	if (_stationary == false){
+		_position = position;
+	}
 }
 
 }

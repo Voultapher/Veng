@@ -53,13 +53,12 @@ void MainGame::initSystems(){
 	player1InitPackage.speed = glm::vec2(0.0f);
 	player1InitPackage.mass = 6348.0f;
 	player1InitPackage.friction = _friction;
-	_gameObjects.players[0]->init(100.0f, 0.8f);
+	_gameObjects.players[0]->init(100.0f, 1.1f);
 	_physicsManager.addPhysicsObject(_gameObjects.players[0]->objectPhysics, player1InitPackage);
 
 	_colorWhite.setColor(255, 255, 255, 255);
 
-	const float WORLD_SIZE = 300.0f;
-	_world.init(glm::vec4(-WORLD_SIZE, -WORLD_SIZE, WORLD_SIZE, WORLD_SIZE));
+	_worldBorder.init(glm::vec4(0.0f, 0.0f, 400.0f, 400.0f), Veng::OrientationFlag::CENTER);
 
 	_bulletSchedule.init(100);
 	_fpsSchedule.init(500);
@@ -91,6 +90,7 @@ void MainGame::gameLoop(){
 		if (_fpsSchedule.ready()){
 			_frameTicks = _fpsLimiter.getFramTicks();
 			printf("FPS: %.2f	FrameTicks: %f\n", _fps, _frameTicks);
+			//printf("Debug bool = %d\n", (int)_debug);
 		}
 	}
 }
@@ -129,10 +129,11 @@ void MainGame::processInput(){
 	playerMovement();
 	camaraMovement();
 
-	if (_inputManager.isKeyPressed(SDL_BUTTON_LEFT)){ // spawn bullets
+	if (_inputManager.isKeyPressed(SDL_BUTTON_LEFT)){ // spawn bullets and or do else
+		_gameObjects.players[0]->objectPhysics->setPosition(_camera.convertScreenToWorld(_inputManager.getMousePosition()));
 		if (_bulletSchedule.ready()){
 			//madness();
-			sprinkle();
+			//sprinkle();
 			//revert();
 			//still();
 		}
@@ -204,7 +205,7 @@ void MainGame::updateGameObjects(){
 	}*/
 
 	for (int i = 0; i < _gameObjects.bullets.size(); i++){ //update all bullets game logic
-		if (_world.outOfBound(_gameObjects.bullets[i]->objectPhysics->getPosAndBoundary())){ // checks if this game object is out of bounds of the game world //tmp to be replaced by a unified gameobject system
+		if (_worldBorder.isOutside(_gameObjects.bullets[i]->objectPhysics)){ // checks if this game object is out of bounds of the game world //tmp to be replaced by a unified gameobject system
 			_gameObjects.bullets[i]->objectPhysics->pushBackAndStop();
 		}
 
@@ -216,7 +217,7 @@ void MainGame::updateGameObjects(){
 		}
 	}
 
-	if (_world.outOfBound(_gameObjects.players[0]->objectPhysics->getPosAndBoundary())){
+	if (_worldBorder.isOutside(_gameObjects.players[0]->objectPhysics)){
 		_gameObjects.players[0]->objectPhysics->pushBackAndStop();
 	}
 }
@@ -286,8 +287,8 @@ void MainGame::spawnBullet(glm::vec2 position, glm::vec2 force){
 void MainGame::madness(){
 	int bullets = 1000;
 	for (int i = 0; i < bullets; i++){
-		float x = _random.generateRandomFloat(-_world.getSize(), _world.getSize());
-		float y = _random.generateRandomFloat(-_world.getSize(), _world.getSize());
+		float x = _random.generateRandomFloat(-_worldBorder.getSize().x, _worldBorder.getSize().y);
+		float y = _random.generateRandomFloat(-_worldBorder.getSize().x, _worldBorder.getSize().y);
 		glm::vec2 position(x, y);
 		glm::vec2 force(0.0f);
 		spawnBullet(position, force);

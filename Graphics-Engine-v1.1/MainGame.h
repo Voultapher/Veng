@@ -20,6 +20,7 @@
 #include <Veng/Timing.h>
 #include <Veng/RandomEngine.h>
 #include <Veng/Schedule.h>
+#include <Veng/Zone2D.h>
 
 #include <functional>
 
@@ -49,7 +50,7 @@ private:
 	void updateGameObjects();
 	Veng::Color speedColor(float speed, float max);
 
-	World _world;
+	Veng::Zone2D _worldBorder;
 
 	GameObjects _gameObjects;
 	Veng::Schedule _player1Schedule;
@@ -89,5 +90,7 @@ private:
 
 	glm::vec4 _normUV;
 	Veng::Color _colorWhite;
+
+	bool _debug;
 };
 
