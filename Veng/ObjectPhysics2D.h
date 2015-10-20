@@ -2,7 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "PhysicsInitPackage2D.h"
+#include "InitPackage2D.h"
+#include "Orientation2D.h"
 
 namespace Veng{
 
@@ -12,7 +13,7 @@ public:
 	ObjectPhysics2D();
 	~ObjectPhysics2D();
 
-	void init(PhysicsInitPackage2D& initPackage);
+	void init(InitPackage2D& initPackage, glm::vec4* posAndBoundaryLink);
 
 	void move();
 	void setAcceleration(glm::vec2 acceleration);
@@ -30,6 +31,8 @@ public:
 	void setSpeedZero();
 	void setPosition(glm::vec2 position);
 
+	GLTexture getTexture() const { return _texture; }
+
 	bool isLocked() const { return _locked; }
 	int getDimension() const { return _dimension; }
 	glm::vec2 getSpeed() const { return _speed; }
@@ -37,7 +40,7 @@ public:
 	glm::vec2 getAcceleration() const { return _acceleration; }
 	float getMass() const { return _mass; }
 	float getFriction() const { return _friction; }
-	glm::vec2 getPosition() const { return _position; }
+	glm::vec2 getPosition() const { return glm::vec2(_posAndBoundary->x, _posAndBoundary->y); }
 	glm::vec2 getMomentum() { return _speed * _mass; }
 	glm::vec4 getPosAndSize();
 	glm::vec4 getPosAndBoundary();
@@ -54,10 +57,10 @@ private:
 	float _friction;
 	float _lowerSpeedTreshold;
 
-	glm::vec2 _position;
+	GLTexture _texture;
+
 	glm::vec4 _posAndSize;
-	glm::vec4 _posAndBoundary;
-	glm::vec2 _boundray;
+	glm::vec4* _posAndBoundary;
 };
 
 }

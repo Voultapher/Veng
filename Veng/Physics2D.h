@@ -14,18 +14,23 @@ public:
 	Physics2D();
 	~Physics2D();
 
-	void addObject(ObjectPhysics2D* physicsObject);
+	void reserveData(unsigned int objectCount);
 
-	void deleteObject(ObjectPhysics2D* physicsObject);
+	ObjectPhysics2D* addObject();
+	glm::vec4* addPosAndBoundary(glm::vec4 posAndBoundary);
+	// void deleteObject(ObjectPhysics2D* physicsObject); // currently 
 
 	void update();
 
-private:
-	std::vector<ObjectPhysics2D*> _physicsObjects;
+	std::vector<ObjectPhysics2D>* getObjects2D() { return &_physicsObjects; } // use uniqu_pntr ? // internal use only
 
-	std::vector<Veng::ObjectPhysics2D* > findIntersection(ObjectPhysics2D* physicsObject);
+private:
+	std::vector<glm::vec4> _posAndBoundarys;
+	std::vector<ObjectPhysics2D> _physicsObjects;
+
+	std::vector<Veng::ObjectPhysics2D* > findIntersection(ObjectPhysics2D& physicsObject);
 	bool twoObjectIntersection(ObjectPhysics2D* physicsObjectA, ObjectPhysics2D* physicsObjectB);
-	void collide(ObjectPhysics2D* objectA, std::vector<Veng::ObjectPhysics2D* > collisionGroup);
+	void collide(ObjectPhysics2D& objectA, std::vector<Veng::ObjectPhysics2D*> collisionGroup);
 };
 
 }

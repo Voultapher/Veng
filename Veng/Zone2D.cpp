@@ -13,17 +13,7 @@ Zone2D::~Zone2D()
 
 void Zone2D::init(glm::vec4 positionAndSize, OrientationFlag orientationFlag){
 
-	switch (orientationFlag){
-	case OrientationFlag::BOTTOM_LEFT:
-		_positionAndSize = positionAndSize;
-		break;
-	case OrientationFlag::CENTER:
-		_positionAndSize = glm::vec4(positionAndSize.x - (positionAndSize.w / 2), positionAndSize.y - (positionAndSize.z / 2), positionAndSize.w, positionAndSize.z);
-		break;
-	case OrientationFlag::TOP_RIGHT:
-		_positionAndSize = glm::vec4(positionAndSize.x - positionAndSize.w, positionAndSize.y - positionAndSize.z, positionAndSize.w, positionAndSize.z);
-		break;
-	}
+	_positionAndSize = getAdjustedPosAndSize(positionAndSize, orientationFlag);
 }
 
 bool Zone2D::isInside(ObjectPhysics2D* objectPhysics){

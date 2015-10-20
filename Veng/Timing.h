@@ -5,7 +5,7 @@ namespace Veng{
 class FpsLimiter{
 public:
 	FpsLimiter();
-	void init(float targetFps);
+	void init(float targetFps, bool delay = true);
 
 	void setMaxFps(float targetFps);
 
@@ -18,6 +18,7 @@ public:
 private:
 	void calculateFPS();
 
+	bool _delay;
 	float _maxFps;
 	float _fps;
 	float _frameTime;

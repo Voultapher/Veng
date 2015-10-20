@@ -1,0 +1,6 @@
+In Physics2D change intersection to more efficent algrithem
+Using Memory manager?
+Cach friendliness! CACH FRIENDLINESS
+
+Change frameticks to a more accurate time base
+Switch time management to time steps rather than frames.

@@ -1,9 +1,8 @@
 #include "Bullet.h"
 
-Bullet::Bullet(int lifeTime)
+Bullet::Bullet(int lifeTime, Veng::ObjectPhysics2D* objectLink)
 {
-	objectPhysics = new Veng::ObjectPhysics2D;
-
+	objectPhysics = objectLink;
 	_lifeTime = lifeTime;
 	
 }
@@ -11,7 +10,6 @@ Bullet::Bullet(int lifeTime)
 
 Bullet::~Bullet()
 {
-	delete objectPhysics;
 }
 
 

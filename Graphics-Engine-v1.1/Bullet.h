@@ -7,7 +7,7 @@
 class Bullet
 {
 public:
-	Bullet(int lifeTime);
+	Bullet(int lifeTime, Veng::ObjectPhysics2D* objectLink);
 	~Bullet();
 
 	Veng::ObjectPhysics2D* objectPhysics;

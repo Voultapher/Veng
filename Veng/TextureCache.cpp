@@ -22,12 +22,9 @@ GLTexture TextureCache::getTexture(std::string texturePath){
 		GLTexture newTexture = ImageLoader::loadPNG(texturePath); // load the texture
 
 		_textureMap.insert(std::make_pair(texturePath, newTexture)); // insert the texture
-
-		printf("Loaded new texture\n");
 		return newTexture;
 	}
 	else{
-		printf("Used cached texture\n");
 		return mit->second;
 	}
 }

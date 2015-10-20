@@ -10,7 +10,7 @@ public:
 	Player();
 	~Player();
 
-	void init(float life, float movementSpeed);
+	void init(float life, float movementSpeed, Veng::ObjectPhysics2D* objectLink);
 
 	Veng::ObjectPhysics2D* objectPhysics;
 

@@ -70,6 +70,10 @@
     <IncludePath>$(SolutionDir)deps/include/;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)deps/include/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
@@ -149,10 +153,12 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="IOManager.cpp" />
     <ClCompile Include="ObjectPhysics2D.cpp" />
+    <ClCompile Include="Orientation2D.cpp" />
     <ClCompile Include="Physics2D.cpp" />
     <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="picoPNG.cpp" />
     <ClCompile Include="RandomEngine.cpp" />
+    <ClCompile Include="Render.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Schedule.cpp" />
     <ClCompile Include="Sprite.cpp" />
@@ -172,11 +178,13 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="IOManager.h" />
     <ClInclude Include="ObjectPhysics2D.h" />
+    <ClInclude Include="Orientation2D.h" />
     <ClInclude Include="Physics2D.h" />
-    <ClInclude Include="PhysicsInitPackage2D.h" />
+    <ClInclude Include="InitPackage2D.h" />
     <ClInclude Include="PhysicsManager.h" />
     <ClInclude Include="picoPNG.h" />
     <ClInclude Include="RandomEngine.h" />
+    <ClInclude Include="Render.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Schedule.h" />
     <ClInclude Include="Sprite.h" />
@@ -187,6 +195,9 @@
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="Zone2D.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ToDo.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

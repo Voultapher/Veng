@@ -16,35 +16,28 @@ ObjectPhysics2D::~ObjectPhysics2D()
 }
 
 glm::vec4 ObjectPhysics2D::getPosAndSize(){
-	_posAndSize.x = _position.x;
-	_posAndSize.y = _position.y;
+	_posAndSize.x = _posAndBoundary->x;
+	_posAndSize.y = _posAndBoundary->y;
 	return _posAndSize;
 }
 
 glm::vec4 ObjectPhysics2D::getPosAndBoundary(){
-	_posAndBoundary.x = _position.x;
-	_posAndBoundary.y = _position.y;
-	return _posAndBoundary;
+	return *_posAndBoundary;
 }
 
 glm::vec4 ObjectPhysics2D::getNextPosAndBoundary(){
-	return glm::vec4(_position.x + _speed.x, _position.y + _speed.y, _boundray.x, _boundray.y);
+	return glm::vec4(_posAndBoundary->x + _speed.x, _posAndBoundary->y + _speed.y, _posAndBoundary->z, _posAndBoundary->w);
 }
 
-void ObjectPhysics2D::init(PhysicsInitPackage2D& initPackage){
+void ObjectPhysics2D::init(InitPackage2D& initPackage, glm::vec4* posAndBoundaryLink){
+	_texture = initPackage.texture;
 	_speed = initPackage.speed;
 	_mass = initPackage.mass;
-	_position = glm::vec2(initPackage.posAndSize.x, initPackage.posAndSize.y);
-	_posAndSize = initPackage.posAndSize;
-
-	_boundray.x = initPackage.posAndSize.z * initPackage.boundaryScale;
-	_boundray.y = initPackage.posAndSize.w * initPackage.boundaryScale;
-	_posAndBoundary.z = _boundray.x;
-	_posAndBoundary.w = _boundray.y;
-
 	_friction = initPackage.friction;
-
 	_stationary = initPackage.stationanry;
+
+	_posAndSize = getAdjustedPosAndSize(initPackage.posAndSize, initPackage.orientationFlag);
+	_posAndBoundary = posAndBoundaryLink;
 }
 
 float ObjectPhysics2D::getSpeedMagnitude(){
@@ -61,26 +54,30 @@ void ObjectPhysics2D::move(){
 		_acceleration = glm::vec2(0.0f);
 
 		_speed *= _friction;
-		_position += _speed;
+		_posAndBoundary->x += _speed.x;
+		_posAndBoundary->y += _speed.y;
 	}
 
 }
 
 void ObjectPhysics2D::undoMovement(){
 	if (_stationary == false){
-		_position -= _speed;
+		_posAndBoundary->x -= _speed.x;
+		_posAndBoundary->y -= _speed.y;
 	}
 }
 
 void ObjectPhysics2D::pushBack(){ // causes corner Problems
 	if (_stationary == false){
-		_position -= glm::vec2(_posAndSize.z / 50.0f, _posAndSize.w / 50.0f);
+		_posAndBoundary->x -= _posAndSize.z / 50.0f;
+		_posAndBoundary->y -= _posAndSize.w / 50.0f;
 	}
 }
 
 void ObjectPhysics2D::pushBackAndStop(){
 	if (_stationary == false){
-		_position -= _speed;
+		_posAndBoundary->x -= _speed.x;
+		_posAndBoundary->y -= _speed.y;
 		_speed = glm::vec2(0.0f);
 		_acceleration = glm::vec2(0.0f);
 	}
@@ -88,15 +85,15 @@ void ObjectPhysics2D::pushBackAndStop(){
 
 void ObjectPhysics2D::suckToCenter(){ // causes center problems
 	if (_stationary == false){
-		_position.x *= 0.98f;
-		_position.y *= 0.98f;
+		_posAndBoundary->x *= 0.98f;
+		_posAndBoundary->y *= 0.98f;
 	}
 }
 
 void ObjectPhysics2D::pushOut(){ // causes center problems
 	if (_stationary == false){
-		_position.x *= 1.02f;
-		_position.y *= 1.02f;
+		_posAndBoundary->x *= 1.02f;
+		_posAndBoundary->y *= 1.02f;
 	}
 }
 
@@ -130,7 +127,8 @@ void ObjectPhysics2D::setSpeedZero(){
 
 void ObjectPhysics2D::setPosition(glm::vec2 position){
 	if (_stationary == false){
-		_position = position;
+		_posAndBoundary->x = position.x;
+		_posAndBoundary->y = position.y;
 	}
 }
 

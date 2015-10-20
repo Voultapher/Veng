@@ -3,17 +3,15 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <functional>
 
 #include <SDL/SDL.h>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
 #include <Veng/Veng.h>
-#include <Veng/GLSLProgram.h>
-#include <Veng/Sprite.h>
 #include <Veng/Window.h>
-#include <Veng/Camera2D.h>
-#include <Veng/SpriteBatch.h>
+#include <Veng/Render.h>
 #include <Veng/InputManager.h>
 #include <Veng/PhysicsManager.h>
 #include <Veng/ObjectPhysics2D.h>
@@ -22,12 +20,9 @@
 #include <Veng/Schedule.h>
 #include <Veng/Zone2D.h>
 
-#include <functional>
-
 #include "GameObjects.h"
 #include "Bullet.h"
 #include "Player.h"
-#include "World.h"
 
 enum class GameState{PLAY, EXIT};
 
@@ -41,14 +36,11 @@ public:
 
 private:
 	void initSystems();
-	void initShaders();
 	void gameLoop();
 	void processInput();
 	void playerMovement();
 	void camaraMovement();
-	void drawGraphics();
 	void updateGameObjects();
-	Veng::Color speedColor(float speed, float max);
 
 	Veng::Zone2D _worldBorder;
 
@@ -65,14 +57,13 @@ private:
 
 	float _friction;
 
-	Veng::Window _window;
+
 	int _screenWidth;
 	int _screenHeight;
+	unsigned int _maxObjects;
 	GameState _gameState;
 
-	Veng::GLSLProgram _colorProgram;
-	Veng::Camera2D _camera;
-	Veng::SpriteBatch _spriteBatch;
+	Veng::Render _render;
 	Veng::InputManager _inputManager;
 	Veng::FpsLimiter _fpsLimiter;
 	Veng::Schedule _fpsSchedule;
@@ -87,10 +78,5 @@ private:
 	float _time;
 	Veng::Vsync _vsyncFlag;
 	unsigned int _windowFlags;
-
-	glm::vec4 _normUV;
-	Veng::Color _colorWhite;
-
-	bool _debug;
 };
 

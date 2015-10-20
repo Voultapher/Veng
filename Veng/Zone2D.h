@@ -3,10 +3,9 @@
 #include <glm\glm.hpp>
 
 #include "ObjectPhysics2D.h"
+#include "Orientation2D.h"
 
 namespace Veng{
-
-	enum class OrientationFlag { BOTTOM_LEFT, CENTER, TOP_RIGHT }; // determines how the boudary is set
 
 class Zone2D
 {
