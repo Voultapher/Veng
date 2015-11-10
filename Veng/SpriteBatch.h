@@ -50,7 +50,7 @@ public:
 	void begin(GlyphSortType sortType = GlyphSortType::TEXTURE);
 	void end();
 	
-	void draw(const glm::vec4& destRect, const glm::vec4& uvRect, GLuint textureId, float depth, const Color& color);
+	void draw(const glm::vec4& destRect, const glm::vec4& uvRect, GLuint textureId, float depth, const ColorRGBA8& color);
 
 	void renderBatches();
 

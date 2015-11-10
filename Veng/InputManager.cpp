@@ -15,6 +15,7 @@ InputManager::~InputManager()
 
 void InputManager::keyDown(unsigned int keyID){
 	_keyMap[keyID] = true;
+	_activeKeyMap[keyID] = false;
 }
 
 void InputManager::keyUp(unsigned int keyID){
@@ -26,14 +27,28 @@ void InputManager::setMousePosition(float x, float y){
 	_mousePosition.y = y;
 }
 
-bool InputManager::isKeyPressed(unsigned int keyID){
+bool InputManager::isKeyDown(unsigned int keyID){
 	auto it = _keyMap.find(keyID);
 	if (it != _keyMap.end()){
 		return it->second;
 	}
-	else{
-		return false;
+	
+	return false;
+}
+
+bool InputManager::isKeyNewPress(unsigned int keyID){
+	auto it = _keyMap.find(keyID);
+	if (it != _keyMap.end()){
+		auto active = _activeKeyMap.find(keyID);
+		if (active != _activeKeyMap.end()){
+			if (active->second == false){
+				active->second = true;
+				return true;
+			}
+		}
 	}
+
+	return false;
 }
 
 }

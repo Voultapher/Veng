@@ -22,7 +22,7 @@ bool Schedule::ready(){
 	int deltaTime = SDL_GetTicks() - _startTime;
 	if (deltaTime > _timeSpan){
 		_startTime = SDL_GetTicks();
-		
+
 		return true;
 	}
 	return false;

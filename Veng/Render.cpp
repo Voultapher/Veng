@@ -78,8 +78,8 @@ void Render::update(){
 	_window.swapBuffer();
 }
 
-Color Render::speedColor(float speed, float max){
-	Veng::Color sC;
+ColorRGBA8 Render::speedColor(float speed, float max){
+	Veng::ColorRGBA8 sC;
 	sC.r = 250;
 	sC.g = std::tanh(max / (speed + 1.0f)) * 250;
 	sC.b = std::tanh(max / (speed + 1.0f)) * 250;

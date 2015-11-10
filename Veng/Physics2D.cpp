@@ -99,19 +99,25 @@ void Physics2D::collide(ObjectPhysics2D& objectA, std::vector<Veng::ObjectPhysic
 	objectA.undoMovement();
 	for (auto collisionObject : collisionGroup){ // undo this cycles movement as it caused an intersection
 		collisionObject->undoMovement();
+
 		int runCounter(0);
 		int runMax(10);
 		while (true){ // no longer easy determistic run time
 			runCounter++;
 			if (twoObjectIntersection(&objectA, collisionObject)){
-				collisionObject->suckToCenter();
-				objectA.pushOut();
+				objectA.suckToCenter();
+				collisionObject->pushOut();
 			}
 			else{
 				break;
 			}
 			if (runCounter == runMax){
-				objectA.setPosition(glm::vec2(objectA.getPosition().x + collisionObject->getPosAndBoundary().w, objectA.getPosition().y - collisionObject->getPosAndBoundary().z)); // allthogh working this is not recommended
+				if (objectA.getSpeedMagnitude() < collisionObject->getSpeedMagnitude()){ // violently move the slower object
+					objectA.setPosition(glm::vec2(objectA.getPosition() + (collisionObject->getSpeedMagnitude() * glm::vec2(collisionObject->getPosAndBoundary().z, collisionObject->getPosAndBoundary().w)))); // allthogh working this is not recommended
+				}
+				else{
+					collisionObject->setPosition(glm::vec2(collisionObject->getPosition() + (objectA.getSpeedMagnitude() * glm::vec2(objectA.getPosAndBoundary().z, objectA.getPosAndBoundary().w)))); // allthogh working this is not recommended
+				}
 				break;
 			}
 		}

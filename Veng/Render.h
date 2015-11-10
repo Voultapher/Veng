@@ -36,7 +36,7 @@ private:
 	GLSLProgram _colorProgram;
 	SpriteBatch _spriteBatch;
 
-	Color speedColor(float speed, float max);
+	ColorRGBA8 speedColor(float speed, float max);
 
 	int _screenWidth;
 	int _screenHeight;
@@ -44,7 +44,7 @@ private:
 	std::vector<ObjectPhysics2D>*_objects2D;
 
 	glm::vec4 _normUV;
-	Veng::Color _colorWhite;
+	Veng::ColorRGBA8 _colorWhite;
 };
 
 }

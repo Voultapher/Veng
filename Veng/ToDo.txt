@@ -2,5 +2,11 @@ In Physics2D change intersection to more efficent algrithem
 Using Memory manager?
 Cach friendliness! CACH FRIENDLINESS
 
-Change frameticks to a more accurate time base
+Change frameticks to a more accurate time base // done
 Switch time management to time steps rather than frames.
+
+Better player movement semantics, movement manager?
+
+Game object handling with component based system.
+
+Switching to Vulcan.

@@ -33,7 +33,7 @@ void ObjectPhysics2D::init(InitPackage2D& initPackage, glm::vec4* posAndBoundary
 	_texture = initPackage.texture;
 	_speed = initPackage.speed;
 	_mass = initPackage.mass;
-	_friction = initPackage.friction;
+	setFriction(initPackage.friction);
 	_stationary = initPackage.stationanry;
 
 	_posAndSize = getAdjustedPosAndSize(initPackage.posAndSize, initPackage.orientationFlag);
@@ -62,8 +62,8 @@ void ObjectPhysics2D::move(){
 
 void ObjectPhysics2D::undoMovement(){
 	if (_stationary == false){
-		_posAndBoundary->x -= _speed.x;
-		_posAndBoundary->y -= _speed.y;
+		_posAndBoundary->x -= _speed.x / _friction;
+		_posAndBoundary->y -= _speed.y / _friction;
 	}
 }
 
@@ -89,6 +89,7 @@ void ObjectPhysics2D::suckToCenter(){ // causes center problems
 		_posAndBoundary->y *= 0.98f;
 	}
 }
+
 
 void ObjectPhysics2D::pushOut(){ // causes center problems
 	if (_stationary == false){
@@ -130,6 +131,10 @@ void ObjectPhysics2D::setPosition(glm::vec2 position){
 		_posAndBoundary->x = position.x;
 		_posAndBoundary->y = position.y;
 	}
+}
+
+void ObjectPhysics2D::setFriction(float friction){
+	_friction = 1.0f - friction;
 }
 
 }

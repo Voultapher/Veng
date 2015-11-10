@@ -20,19 +20,31 @@ void FpsLimiter::setMaxFps(float maxFps){
 
 void FpsLimiter::begin(){
 	_startTicks = SDL_GetTicks(); // this will cause problems after more than 49 days of runtime
+	_start = _clock.now();
 }
 
 float FpsLimiter::end(){ // end will return the current fps
 	calculateFPS();
+	_end = _clock.now();
 
 	if (_delay){
-		_frameTicks = ((SDL_GetTicks()) - _startTicks) - 1.0f; // the -1 makes that it stays below the maxFps
-		if (1000.0f / _maxFps > _frameTicks){
-			SDL_Delay((1000.0f / _maxFps) - _frameTicks);
+		float frameTicks = ((SDL_GetTicks()) - _startTicks) - 1.0f; // the -1 makes that it stays below the maxFps
+		if (1000.0f / _maxFps > frameTicks){
+			SDL_Delay((1000.0f / _maxFps) - frameTicks);
 		}
 	}
 
 	return _fps;
+}
+
+float FpsLimiter::getFrameTimeNano(){
+	auto deltaTime = (std::chrono::duration_cast<std::chrono::nanoseconds>(_end - _start).count());
+	return static_cast<float> (deltaTime);
+}
+
+float FpsLimiter::getFrameTimeMicro(){
+	auto deltaTime = (std::chrono::duration_cast<std::chrono::microseconds>(_end - _start).count());
+	return static_cast<float> (deltaTime);
 }
 
 void FpsLimiter::calculateFPS(){

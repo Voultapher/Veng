@@ -23,12 +23,14 @@ public:
 	void pushBack();
 	void pushBackAndStop();
 	void suckToCenter();
+	//void suckInvertedDirection();
 	void pushOut();
 	void lock();
 	void unLock();
 
 	void setSpeed(glm::vec2 speed);
 	void setSpeedZero();
+	void setFriction(float friction);
 	void setPosition(glm::vec2 position);
 
 	GLTexture getTexture() const { return _texture; }

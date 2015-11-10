@@ -29,9 +29,9 @@ int Window::create(std::string windowName, int screenWidth, int screenHeight, un
 	case BORDERLESS:
 		flags |= SDL_WINDOW_BORDERLESS;
 	}
-
-
-
+	if (currentFlags != BORDERLESS){
+		flags |= SDL_WINDOW_RESIZABLE;
+	}
 
 	_sdlWindow = SDL_CreateWindow(windowName.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, flags); // create the SDL window
 	if (_sdlWindow == nullptr){

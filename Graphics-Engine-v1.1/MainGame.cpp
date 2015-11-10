@@ -3,12 +3,12 @@
 #include <cstdlib>
 
 #include "MainGame.h"
-#include <Veng/Errors.h>
-#include <Veng/ResourceManager.h>
-#include <Veng/InitPackage2D.h>
+#include <Veng\Errors.h>
+#include <Veng\ResourceManager.h>
+#include <Veng\InitPackage2D.h>
+#include <Veng\Clock.h>
 
 MainGame::MainGame() :
-	_friction(0.94f),
 	_screenWidth(720),
 	_screenHeight(720),
 	_maxObjects(1e4),
@@ -51,10 +51,10 @@ void MainGame::initSystems(){
 	player1InitPackage.boundaryScale = 0.8f;
 	player1InitPackage.speed = glm::vec2(0.0f);
 	player1InitPackage.mass = 6348.0f;
-	player1InitPackage.friction = _friction;
+	player1InitPackage.friction = 0.06f;
 	_gameObjects.players[0]->init(100.0f, 1.1f, _physicsManager.addPhysicsObject(player1InitPackage));
 
-	_worldBorder.init(glm::vec4(0.0f, 0.0f, 90000.0f, 90000.0f), Veng::OrientationFlag::CENTER);
+	_worldBorder.init(glm::vec4(0.0f, 0.0f, 400.0f, 400.0f), Veng::OrientationFlag::CENTER);
 
 	_bulletSchedule.init(100);
 	_fpsSchedule.init(500);
@@ -79,9 +79,8 @@ void MainGame::gameLoop(){
 
 		_fps = _fpsLimiter.end(); // delay further calculations based on the target fps
 		if (_fpsSchedule.ready()){
-			_frameTicks = _fpsLimiter.getFramTicks();
-			printf("FPS: %.2f	FrameTicks: %f\n", _fps, _frameTicks);
-			//printf("Debug bool = %d\n", (int)_debug);
+			float _frameTime = _fpsLimiter.getFrameTimeMicro();
+			printf("FPS: %.2f	FrameTime: %f\n", _fps, _frameTime);
 		}
 	}
 }
@@ -113,42 +112,42 @@ void MainGame::processInput(){
 	}
 
 
-	if (_inputManager.isKeyPressed(SDLK_ESCAPE)){ // close the game with ESC
+	if (_inputManager.isKeyDown(SDLK_ESCAPE)){ // close the game with ESC
 		_gameState = GameState::EXIT;
 	}
 
 	playerMovement();
 	camaraMovement();
 
-	if (_inputManager.isKeyPressed(SDL_BUTTON_LEFT)){ // spawn bullets and or do else
-		_gameObjects.players[0]->objectPhysics->setPosition(_render.camera.convertScreenToWorld(_inputManager.getMousePosition()));
-		if (_bulletSchedule.ready()){
+	if (_inputManager.isKeyNewPress(SDL_BUTTON_LEFT)){ // spawn bullets and or do else
+		//_gameObjects.players[0]->objectPhysics->setPosition(_render.camera.convertScreenToWorld(_inputManager.getMousePosition()));
+		//if (_bulletSchedule.ready()){
 			//madness();
 			//sprinkle();
 			//revert();
-			//still();
-		}
+			still();
+		//}
 	}
 }
 
 void MainGame::playerMovement(){
 	bool w = false, s = false, a = false, d = false;
-	if (_inputManager.isKeyPressed(SDLK_w)){ // player movement
+	if (_inputManager.isKeyDown(SDLK_w)){ // player movement
 		w = true;
-		_gameObjects.players[0]->objectPhysics->addAcceleration(glm::vec2(0.0f, 1.0f) * _gameObjects.players[0]->getMovementSpeed());
+		_gameObjects.players[0]->objectPhysics->addAcceleration(glm::vec2(0.0f, 1.0f) * _gameObjects.players[0]->getMovementSpeed()); // long syntax, should be smaller
 	}
 
-	if (_inputManager.isKeyPressed(SDLK_s)){
+	if (_inputManager.isKeyDown(SDLK_s)){
 		s = true;
 		_gameObjects.players[0]->objectPhysics->addAcceleration(glm::vec2(0.0f, -1.0f) * _gameObjects.players[0]->getMovementSpeed());
 	}
 
-	if (_inputManager.isKeyPressed(SDLK_a)){
+	if (_inputManager.isKeyDown(SDLK_a)){
 		a = true;
 		_gameObjects.players[0]->objectPhysics->addAcceleration(glm::vec2(-1.0f, 0.0f) * _gameObjects.players[0]->getMovementSpeed());
 	}
 
-	if (_inputManager.isKeyPressed(SDLK_d)){
+	if (_inputManager.isKeyDown(SDLK_d)){
 		d = true;
 		_gameObjects.players[0]->objectPhysics->addAcceleration(glm::vec2(1.0f, 0.0f) * _gameObjects.players[0]->getMovementSpeed());
 	}
@@ -162,27 +161,27 @@ void MainGame::camaraMovement(){
 	const float SCALE_SPEED = 1.02f;
 	const float MIN_SCALE = 0.1f;
 
-	if (_inputManager.isKeyPressed(SDLK_UP)){ // camera movement
+	if (_inputManager.isKeyDown(SDLK_UP)){ // camera movement
 		_render.camera.setPosition(_render.camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED) / _render.camera.getScale());
 	}
 
-	if (_inputManager.isKeyPressed(SDLK_DOWN)){
+	if (_inputManager.isKeyDown(SDLK_DOWN)){
 		_render.camera.setPosition(_render.camera.getPosition() + glm::vec2(0.0f, -CAMERA_SPEED) / _render.camera.getScale());
 	}
 
-	if (_inputManager.isKeyPressed(SDLK_LEFT)){
+	if (_inputManager.isKeyDown(SDLK_LEFT)){
 		_render.camera.setPosition(_render.camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f) / _render.camera.getScale());
 	}
 
-	if (_inputManager.isKeyPressed(SDLK_RIGHT)){
+	if (_inputManager.isKeyDown(SDLK_RIGHT)){
 		_render.camera.setPosition(_render.camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f) / _render.camera.getScale());
 	}
 
-	if (_inputManager.isKeyPressed(SDLK_q)){ // camera zoom
+	if (_inputManager.isKeyDown(SDLK_q)){ // camera zoom
 		_render.camera.setScale(_render.camera.getScale() * SCALE_SPEED);
 	}
 
-	if (_inputManager.isKeyPressed(SDLK_e)){
+	if (_inputManager.isKeyDown(SDLK_e)){
 		if (_render.camera.getScale() > MIN_SCALE){
 			_render.camera.setScale(_render.camera.getScale() / SCALE_SPEED);
 		}
@@ -211,21 +210,21 @@ void MainGame::updateGameObjects(){
 
 void MainGame::spawnBullet(glm::vec2 position, glm::vec2 force){
 	float lifeTime = 2000.0f;
-	static Veng::GLTexture bulletTextureId = Veng::ResourceManager::getTexture("Textures/Items/keyred.png");
+	static Veng::GLTexture bulletTexture = Veng::ResourceManager::getTexture("Textures/Items/keyred.png");
 
 	glm::vec2 mousePosition = _inputManager.getMousePosition();
 	mousePosition = _render.camera.convertScreenToWorld(mousePosition);
 
 	Veng::InitPackage2D bulletInitPackage;
 	float bulletSize = 35.0f;//_random.generateRandomFloat(15.0f, 25.0f);
-	bulletInitPackage.texture = bulletTextureId;
+	bulletInitPackage.texture = bulletTexture;
 	bulletInitPackage.mass = bulletSize * bulletSize * 10;
 	bulletInitPackage.speed = glm::vec2(0.0f);
 	bulletInitPackage.posAndSize = glm::vec4(position.x, position.y, bulletSize, bulletSize); //tmp
 	//bulletInitPackage.posAndSize = glm::vec4(0.0f, 0.0f, bulletSize, bulletSize); //tmp
 	//bulletInitPackage.posAndSize = glm::vec4(playerPosition.x - bulletSize, playerPosition.y - bulletSize, bulletSize, bulletSize);
 	bulletInitPackage.boundaryScale = 0.7;
-	bulletInitPackage.friction = 0.97f;// _friction;
+	bulletInitPackage.friction = 0.03f;// _friction;
 
 	_gameObjects.bullets.emplace_back(new Bullet(lifeTime, _physicsManager.addPhysicsObject(bulletInitPackage)));
 
@@ -265,8 +264,6 @@ void MainGame::revert(){
 }
 
 void MainGame::still(){
-	if (_sprinkleSchedule.ready()){
 		glm::vec2 mousePosition = _render.camera.convertScreenToWorld(_inputManager.getMousePosition());
 		spawnBullet(mousePosition, glm::vec2(0.0f));
-	}
 }

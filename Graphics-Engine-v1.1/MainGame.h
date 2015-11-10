@@ -55,8 +55,6 @@ private:
 	void still();
 	Veng::Schedule _sprinkleSchedule;
 
-	float _friction;
-
 
 	int _screenWidth;
 	int _screenHeight;
