@@ -1,6 +1,6 @@
 #include "ResourceManager.h"
 
-namespace Veng{
+namespace veng{
 
 	TextureCache ResourceManager::_textureCache;
 

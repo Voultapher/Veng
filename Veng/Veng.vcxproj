@@ -153,7 +153,7 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="IOManager.cpp" />
     <ClCompile Include="ObjectPhysics2D.cpp" />
-    <ClCompile Include="Orientation2D.cpp" />
+    <ClCompile Include="Alignment2D.cpp" />
     <ClCompile Include="Physics2D.cpp" />
     <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="picoPNG.cpp" />
@@ -165,6 +165,7 @@
     <ClCompile Include="SpriteBatch.cpp" />
     <ClCompile Include="TextureCache.cpp" />
     <ClCompile Include="Timing.cpp" />
+    <ClCompile Include="Utility.cpp" />
     <ClCompile Include="Veng.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="Zone2D.cpp" />
@@ -175,11 +176,12 @@
     <ClInclude Include="Errors.h" />
     <ClInclude Include="GLSLProgram.h" />
     <ClInclude Include="GLTexture.h" />
+    <ClInclude Include="GROC.h" />
     <ClInclude Include="ImageLoader.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="IOManager.h" />
     <ClInclude Include="ObjectPhysics2D.h" />
-    <ClInclude Include="Orientation2D.h" />
+    <ClInclude Include="Alignment2D.h" />
     <ClInclude Include="Physics2D.h" />
     <ClInclude Include="InitPackage2D.h" />
     <ClInclude Include="PhysicsManager.h" />
@@ -192,6 +194,7 @@
     <ClInclude Include="SpriteBatch.h" />
     <ClInclude Include="TextureCache.h" />
     <ClInclude Include="Timing.h" />
+    <ClInclude Include="Utility.h" />
     <ClInclude Include="Veng.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />

@@ -2,15 +2,15 @@
 
 #include <glm/glm.hpp>
 
-#include <Veng/ObjectPhysics2D.h>
+#include <veng/ObjectPhysics2D.h>
 
 class Bullet
 {
 public:
-	Bullet(int lifeTime, Veng::ObjectPhysics2D* objectLink);
+	Bullet(int lifeTime, veng::ObjectPhysics2D* objectLink);
 	~Bullet();
 
-	Veng::ObjectPhysics2D* objectPhysics;
+	veng::ObjectPhysics2D* objectPhysics;
 
 	bool update(); // retuns true when lifeTime is 0
 

@@ -4,7 +4,7 @@
 
 #include "TextureCache.h"
 
-namespace Veng{
+namespace veng{
 
 	class ResourceManager
 	{

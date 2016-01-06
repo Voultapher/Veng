@@ -2,7 +2,7 @@
 
 #include <SDL\SDL.h>
 
-namespace Veng{
+namespace veng{
 
 Schedule::Schedule()
 {

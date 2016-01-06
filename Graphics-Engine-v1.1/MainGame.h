@@ -9,16 +9,16 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-#include <Veng/Veng.h>
-#include <Veng/Window.h>
-#include <Veng/Render.h>
-#include <Veng/InputManager.h>
-#include <Veng/PhysicsManager.h>
-#include <Veng/ObjectPhysics2D.h>
-#include <Veng/Timing.h>
-#include <Veng/RandomEngine.h>
-#include <Veng/Schedule.h>
-#include <Veng/Zone2D.h>
+#include <veng/veng.h>
+#include <veng/Window.h>
+#include <veng/Render.h>
+#include <veng/InputManager.h>
+#include <veng/PhysicsManager.h>
+#include <veng/ObjectPhysics2D.h>
+#include <veng/Timing.h>
+#include <veng/RandomEngine.h>
+#include <veng/Schedule.h>
+#include <veng/Zone2D.h>
 
 #include "GameObjects.h"
 #include "Bullet.h"
@@ -42,31 +42,31 @@ private:
 	void camaraMovement();
 	void updateGameObjects();
 
-	Veng::Zone2D _worldBorder;
+	veng::Zone2D _worldBorder;
 
 	GameObjects _gameObjects;
-	Veng::Schedule _player1Schedule;
+	veng::Schedule _player1Schedule;
 
 	void spawnBullet(glm::vec2 position, glm::vec2 force);
-	Veng::Schedule _bulletSchedule;
+	veng::Schedule _bulletSchedule;
 	void madness();
 	void sprinkle();
 	void revert();
 	void still();
-	Veng::Schedule _sprinkleSchedule;
+	veng::Schedule _sprinkleSchedule;
 
 
 	int _screenWidth;
 	int _screenHeight;
-	unsigned int _maxObjects;
+	std::size_t _maxObjects;
 	GameState _gameState;
 
-	Veng::Render _render;
-	Veng::InputManager _inputManager;
-	Veng::FpsLimiter _fpsLimiter;
-	Veng::Schedule _fpsSchedule;
-	Veng::PhysicsManager _physicsManager;
-	Veng::RandomEngine _random;
+	veng::Render _render;
+	veng::InputManager _inputManager;
+	veng::FpsLimiter _fpsLimiter;
+	veng::Schedule _fpsSchedule;
+	veng::PhysicsManager _physicsManager;
+	veng::RandomEngine _random;
 
 	float _maxFPS;
 	float _fps;
@@ -74,7 +74,7 @@ private:
 	float _frameTicks;
 
 	float _time;
-	Veng::Vsync _vsyncFlag;
+	veng::Vsync _vsyncMode;
 	unsigned int _windowFlags;
 };
 

@@ -3,7 +3,7 @@
 #include <vector>
 
 
-namespace Veng{
+namespace veng{
 class Schedule
 {
 public:

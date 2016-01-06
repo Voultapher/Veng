@@ -4,7 +4,7 @@
 #include "GLSLProgram.h"
 #include "Errors.h"
 
-namespace Veng{
+namespace veng{
 
 GLSLProgram::GLSLProgram() : _numAttributes(0), _programID(0), _vertexShaderID(0), _fragmentShaderID(0)
 {

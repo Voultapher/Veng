@@ -1,6 +1,6 @@
 #include "Bullet.h"
 
-Bullet::Bullet(int lifeTime, Veng::ObjectPhysics2D* objectLink)
+Bullet::Bullet(int lifeTime, veng::ObjectPhysics2D* objectLink)
 {
 	objectPhysics = objectLink;
 	_lifeTime = lifeTime;

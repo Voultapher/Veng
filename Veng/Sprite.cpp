@@ -4,7 +4,7 @@
 #include "Vertex.h"
 #include "ResourceManager.h"
 
-namespace Veng{
+namespace veng{
 
 Sprite::Sprite() : _vboID(0)
 {

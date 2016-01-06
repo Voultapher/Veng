@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Veng{
+namespace veng{
 
 	extern int init();
 

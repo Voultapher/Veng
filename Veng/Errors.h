@@ -2,8 +2,9 @@
 
 #include <string>
 
-namespace Veng{
+namespace veng{
 
-	extern void fatalError(std::string errorString);
+extern void fatalError(std::string errorString);
+extern void printToErrorLog(std::string errorString);
 
 }

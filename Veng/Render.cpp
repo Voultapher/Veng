@@ -6,7 +6,7 @@
 #include "ResourceManager.h"
 #include "Physics2D.h"
 
-namespace Veng{
+namespace veng{
 
 Render::Render() :
 	_normUV(0.0f, 0.0f, 1.0f, 1.0f)
@@ -18,12 +18,12 @@ Render::~Render()
 {
 }
 
-void Render::init(std::string windowName, int screenWidth, int screenHeight, unsigned int windowFlags, unsigned char vsyncFlag){
+void Render::init(std::string windowName, int screenWidth, int screenHeight, unsigned int windowFlags, Vsync vsyncMode){
 
 	_screenWidth = screenWidth;
 	_screenHeight = screenHeight;
 
-	_window.create("Graphics-Engine", _screenWidth, _screenHeight, windowFlags, vsyncFlag);
+	_window.create("Graphics-Engine", _screenWidth, _screenHeight, windowFlags, vsyncMode);
 	camera.init(_screenWidth, _screenHeight);
 	_spriteBatch.init();
 	initShaders();
@@ -64,7 +64,8 @@ void Render::update(){
 	_spriteBatch.begin(); //
 
 	for (auto& object : (*_objects2D)){
-		_spriteBatch.draw(object.getPosAndSize(), _normUV, object.getTexture().id, 0.0f, _colorWhite);
+		if (camera.isVisible(&object)) // 2D camera culling, render only what can be seen
+			_spriteBatch.draw(object.getPosAndSize(), _normUV, object.getTexture().id, 0.0f, _colorWhite);
 	}
 
 	_spriteBatch.end();
@@ -79,7 +80,7 @@ void Render::update(){
 }
 
 ColorRGBA8 Render::speedColor(float speed, float max){
-	Veng::ColorRGBA8 sC;
+	veng::ColorRGBA8 sC;
 	sC.r = 250;
 	sC.g = std::tanh(max / (speed + 1.0f)) * 250;
 	sC.b = std::tanh(max / (speed + 1.0f)) * 250;

@@ -3,7 +3,7 @@
 #include <string>
 #include <GL/glew.h>
 
-namespace Veng{
+namespace veng{
 
 	class GLSLProgram
 	{

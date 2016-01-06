@@ -1,7 +1,7 @@
 #include "Window.h"
 #include "Errors.h"
 
-namespace Veng{
+namespace veng{
 
 Window::Window()
 {
@@ -12,28 +12,26 @@ Window::~Window()
 {
 }
 
-int Window::create(std::string windowName, int screenWidth, int screenHeight, unsigned int currentFlags, unsigned char vsyncFlag){
+void Window::create(std::string windowName, int screenWidth, int screenHeight, unsigned int currentsdlFlags, Vsync vsyncMode){
 	_screenWidth = screenWidth;
 	_screenHeight = screenHeight;
 
-	Uint32 flags = SDL_WINDOW_OPENGL;
+	Uint32 sdlFlags = SDL_WINDOW_OPENGL;
 
-	switch (currentFlags){ // set the window flags
-
-	case INVISIBLE:
-		flags |= SDL_WINDOW_HIDDEN;
-
-	case FULLSCREEN:
-		flags |= SDL_WINDOW_FULLSCREEN;
-
-	case BORDERLESS:
-		flags |= SDL_WINDOW_BORDERLESS;
+	if (currentsdlFlags & WindowFlag::INVISIBLE){
+		sdlFlags |= SDL_WINDOW_HIDDEN;
 	}
-	if (currentFlags != BORDERLESS){
-		flags |= SDL_WINDOW_RESIZABLE;
+	if (currentsdlFlags & WindowFlag::FULLSCREEN){
+		sdlFlags |= SDL_WINDOW_FULLSCREEN;
+	}
+	if (currentsdlFlags & WindowFlag::BORDERLESS){
+		sdlFlags |= SDL_WINDOW_BORDERLESS;
+	}
+	if (currentsdlFlags & WindowFlag::RESIZABLE){
+		sdlFlags |= SDL_WINDOW_RESIZABLE;
 	}
 
-	_sdlWindow = SDL_CreateWindow(windowName.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, flags); // create the SDL window
+	_sdlWindow = SDL_CreateWindow(windowName.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, sdlFlags); // create the SDL window
 	if (_sdlWindow == nullptr){
 		fatalError("SDL window could not be created!");
 	}
@@ -48,21 +46,19 @@ int Window::create(std::string windowName, int screenWidth, int screenHeight, un
 		fatalError("Could not initialize glew");
 	}
 
-	glClearColor(0.02f, 0.07f, 0.09f, 1.0f);
+	glClearColor(0.02f, 0.07f, 0.09f, 1.0f); // BackgroundColor
 
 	printf("*** OpenGL Versiojn %s ***", glGetString(GL_VERSION));
 
-	if (vsyncFlag == VSYNC_ON){ // set Vsync on or off
+	if (vsyncMode == Vsync::VSYNC_ON){ // set Vsync on or off
 		SDL_GL_SetSwapInterval(1);
 	}
-	else if (vsyncFlag == VSYNC_OFF){
+	else if (vsyncMode == Vsync::VSYNC_OFF){
 		SDL_GL_SetSwapInterval(0);
 	}
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	return 0; //everything worked
 }
 
 void Window::swapBuffer(){

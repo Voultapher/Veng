@@ -3,20 +3,20 @@
 #include <cstdlib>
 
 #include "MainGame.h"
-#include <Veng\Errors.h>
-#include <Veng\ResourceManager.h>
-#include <Veng\InitPackage2D.h>
-#include <Veng\Clock.h>
+#include <veng\Errors.h>
+#include <veng\ResourceManager.h>
+#include <veng\InitPackage2D.h>
+#include <veng\Clock.h>
 
 MainGame::MainGame() :
-	_screenWidth(720),
-	_screenHeight(720),
-	_maxObjects(1e4),
+	_screenWidth(1200),
+	_screenHeight(500),
+	_maxObjects(1e6),
 	_gameState(GameState::PLAY),
 	_maxFPS(60.0f),
 	_time(0),
-	_vsyncFlag(Veng::VSYNC_OFF),
-	_windowFlags(Veng::BORDERLESS)
+	_vsyncMode(veng::Vsync::VSYNC_OFF),
+	_windowFlags(veng::WindowFlag::BORDERLESS)
 {
 
 }
@@ -34,9 +34,9 @@ void MainGame::run(){
 
 void MainGame::initSystems(){
 
-	Veng::init();
+	veng::init();
 
-	_render.init("Graphics-Engine", _screenWidth, _screenHeight, _windowFlags, _vsyncFlag);
+	_render.init("Graphics-Engine", _screenWidth, _screenHeight, _windowFlags, _vsyncMode);
 	_physicsManager.init(_maxObjects, _render); // linking the 2 together
 
 	_fpsLimiter.init(_maxFPS);
@@ -45,8 +45,8 @@ void MainGame::initSystems(){
 
 	const glm::vec2 PLAYER_SPAWN(0.0f, 0.0f); // player init
 	const float PLAYER_SPEED = 1.0f;
-	Veng::InitPackage2D player1InitPackage;
-	player1InitPackage.texture = Veng::ResourceManager::getTexture("Textures/Player/p1_hurt.png");
+	veng::InitPackage2D player1InitPackage;
+	player1InitPackage.texture = veng::ResourceManager::getTexture("Textures/Player/p1_hurt.png");
 	player1InitPackage.posAndSize = glm::vec4(PLAYER_SPAWN.x, PLAYER_SPAWN.y, 69.0f, 92.0f);
 	player1InitPackage.boundaryScale = 0.8f;
 	player1InitPackage.speed = glm::vec2(0.0f);
@@ -54,16 +54,30 @@ void MainGame::initSystems(){
 	player1InitPackage.friction = 0.06f;
 	_gameObjects.players[0]->init(100.0f, 1.1f, _physicsManager.addPhysicsObject(player1InitPackage));
 
-	_worldBorder.init(glm::vec4(0.0f, 0.0f, 400.0f, 400.0f), Veng::OrientationFlag::CENTER);
+	_worldBorder.init(glm::vec4(0.0f, 0.0f, 4000.0f, 4000.0f), veng::Alignment2D::CENTER);
 
 	_bulletSchedule.init(100);
 	_fpsSchedule.init(500);
 	_player1Schedule.init(100);
 	_sprinkleSchedule.init(400);
 
-	for (int i = 0; i < 1; i++){ // stress testing game object design
-		spawnBullet(glm::vec2(i*25,200), glm::vec2(200.0f));
-	}
+	/*int rowCount = 200;
+	for (int i = 0; i < 1e1 / rowCount; ++i){ // debug stress testing game object design
+		for (int row = 0; row < rowCount; ++row)
+			spawnBullet(glm::vec2(row * 35, i * 50), glm::vec2(200.0f));
+		//spawnBullet(glm::vec2(35, 200), glm::vec2(200.0f));
+	}*/
+
+	/*glm::vec2 force = glm::vec2(0.f, 0.f);
+	glm::vec4 posA = veng::getAdjustedPosAndSize(glm::vec4(0.f, 0.f, _screenHeight, _screenWidth), veng::Alignment2D::CENTER);
+	glm::vec4 posB = veng::getAdjustedPosAndSize(glm::vec4(0.f, 0.f, -_screenHeight, -_screenWidth), veng::Alignment2D::CENTER);
+	glm::vec4 posC = veng::getAdjustedPosAndSize(glm::vec4(0.f, 0.f, -_screenHeight, _screenWidth), veng::Alignment2D::CENTER);
+	glm::vec4 posD = veng::getAdjustedPosAndSize(glm::vec4(0.f, 0.f, _screenHeight, -_screenWidth), veng::Alignment2D::CENTER);
+	spawnBullet(glm::vec2(posA.x, posA.y), force); // left bottom
+	spawnBullet(glm::vec2(posB.x, posB.y), force); // right top
+	spawnBullet(glm::vec2(posC.x, posC.y), force); // left top
+	spawnBullet(glm::vec2(posD.x, posD.y), force); // right bottom*/ // debug corners
+	//veng::printToErrorLog("testDate");
 }
 
 void MainGame::gameLoop(){
@@ -72,7 +86,7 @@ void MainGame::gameLoop(){
 
 		processInput();
 
-		updateGameObjects();
+		//updateGameObjects();
 
 		_physicsManager.update();
 		_render.update();
@@ -80,7 +94,7 @@ void MainGame::gameLoop(){
 		_fps = _fpsLimiter.end(); // delay further calculations based on the target fps
 		if (_fpsSchedule.ready()){
 			float _frameTime = _fpsLimiter.getFrameTimeMicro();
-			printf("FPS: %.2f	FrameTime: %f\n", _fps, _frameTime);
+			printf("FPS: %.2f	FrameTime: %.1f	micro seconds\n", _fps, _frameTime);
 		}
 	}
 }
@@ -210,12 +224,12 @@ void MainGame::updateGameObjects(){
 
 void MainGame::spawnBullet(glm::vec2 position, glm::vec2 force){
 	float lifeTime = 2000.0f;
-	static Veng::GLTexture bulletTexture = Veng::ResourceManager::getTexture("Textures/Items/keyred.png");
+	static veng::GLTexture bulletTexture = veng::ResourceManager::getTexture("Textures/Items/keyred.png");
 
 	glm::vec2 mousePosition = _inputManager.getMousePosition();
 	mousePosition = _render.camera.convertScreenToWorld(mousePosition);
 
-	Veng::InitPackage2D bulletInitPackage;
+	veng::InitPackage2D bulletInitPackage;
 	float bulletSize = 35.0f;//_random.generateRandomFloat(15.0f, 25.0f);
 	bulletInitPackage.texture = bulletTexture;
 	bulletInitPackage.mass = bulletSize * bulletSize * 10;
@@ -223,7 +237,7 @@ void MainGame::spawnBullet(glm::vec2 position, glm::vec2 force){
 	bulletInitPackage.posAndSize = glm::vec4(position.x, position.y, bulletSize, bulletSize); //tmp
 	//bulletInitPackage.posAndSize = glm::vec4(0.0f, 0.0f, bulletSize, bulletSize); //tmp
 	//bulletInitPackage.posAndSize = glm::vec4(playerPosition.x - bulletSize, playerPosition.y - bulletSize, bulletSize, bulletSize);
-	bulletInitPackage.boundaryScale = 0.7;
+	bulletInitPackage.boundaryScale = 0.7f;
 	bulletInitPackage.friction = 0.03f;// _friction;
 
 	_gameObjects.bullets.emplace_back(new Bullet(lifeTime, _physicsManager.addPhysicsObject(bulletInitPackage)));

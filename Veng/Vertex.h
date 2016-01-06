@@ -2,7 +2,7 @@
 
 #include <GL/glew.h>
 
-namespace Veng{
+namespace veng{
 
 struct Position{
 	float x;

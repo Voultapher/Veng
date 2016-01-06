@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include <Veng/ObjectPhysics2D.h>
+#include <veng/ObjectPhysics2D.h>
 
 class Player
 {
@@ -10,9 +10,9 @@ public:
 	Player();
 	~Player();
 
-	void init(float life, float movementSpeed, Veng::ObjectPhysics2D* objectLink);
+	void init(float life, float movementSpeed, veng::ObjectPhysics2D* objectLink);
 
-	Veng::ObjectPhysics2D* objectPhysics;
+	veng::ObjectPhysics2D* objectPhysics;
 
 	float getMovementSpeed() const { return _movementSpeed; }
 

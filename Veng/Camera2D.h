@@ -2,7 +2,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace Veng{
+#include "Zone2D.h"
+
+namespace veng{
 
 	class Camera2D
 	{
@@ -10,8 +12,10 @@ namespace Veng{
 		Camera2D();
 		~Camera2D();
 
-		void update();
 		void init(int screenWidth, int screenHeight);
+		void update();
+
+		bool isVisible(ObjectPhysics2D* object);
 
 		// setters
 		void setPosition(const glm::vec2& newPosition) { _position = newPosition; _needsMatrixUpdate = true; }
@@ -22,10 +26,11 @@ namespace Veng{
 		glm::vec2 getPosition() { return _position; }
 		glm::mat4 getCameraMatrix() { return _cameraMatrix; }
 		glm::vec2 convertScreenToWorld(glm::vec2 screenCoords);
-
 	private:
+
 		bool _needsMatrixUpdate;
 		int _screenWidth, _screenHeight;
+		Zone2D _cameraZone;
 		float _scale;
 		glm::vec2 _position;
 		glm::mat4 _cameraMatrix;

@@ -2,7 +2,7 @@
 
 #include "SpriteBatch.h"
 
-namespace Veng{
+namespace veng{
 
 SpriteBatch::SpriteBatch() :
 _vbo(0),
@@ -24,10 +24,6 @@ void SpriteBatch::init(){
 void SpriteBatch::begin(GlyphSortType sortType /* = GlyphSortType::TEXTURE */){
 	_sortType = sortType;
 	_renderBatches.clear();
-	int glyphSize = _glyphs.size();
-	for (int i = 0; i < glyphSize; i++){ // free pointer memory
-		delete _glyphs[i];
-	}
 	_glyphs.clear();
 }
 
@@ -37,27 +33,8 @@ void SpriteBatch::end(){
 }
 
 void SpriteBatch::draw(const glm::vec4& destRect, const glm::vec4& uvRect, GLuint textureId, float depth, const ColorRGBA8& color){
-	Glyph* newGlyph = new Glyph;
-	newGlyph->texture = textureId;
-	newGlyph->depth = depth;
 
-	newGlyph->topLeft.color = color;
-	newGlyph->topLeft.setPosition(destRect.x, destRect.y + destRect.w);
-	newGlyph->topLeft.setUV(uvRect.x, uvRect.y + uvRect.w);
-
-	newGlyph->bottomLeft.color = color;
-	newGlyph->bottomLeft.setPosition(destRect.x, destRect.y);
-	newGlyph->bottomLeft.setUV(uvRect.x, uvRect.y);
-
-	newGlyph->topRight.color = color;
-	newGlyph->topRight.setPosition(destRect.x + destRect.z, destRect.y + destRect.w);
-	newGlyph->topRight.setUV(uvRect.x + uvRect.z, uvRect.y + uvRect.w);
-
-	newGlyph->bottomRight.color = color;
-	newGlyph->bottomRight.setPosition(destRect.x + destRect.z, destRect.y);
-	newGlyph->bottomRight.setUV(uvRect.x + uvRect.z, uvRect.y);
-
-	_glyphs.push_back(newGlyph);
+	_glyphs.emplace_back(destRect, uvRect, textureId, depth, color);
 }
 
 void SpriteBatch::renderBatches(){
@@ -83,30 +60,30 @@ void SpriteBatch::createRenderBatches(){
 
 	int offset = 0;
 	int cv = 0; // current vertex
-	_renderBatches.emplace_back(offset, 6, _glyphs[0]->texture); // filling the first vector slot
-	vertices[cv++] = _glyphs[0]->topLeft;
-	vertices[cv++] = _glyphs[0]->bottomLeft;
-	vertices[cv++] = _glyphs[0]->bottomRight;
-	vertices[cv++] = _glyphs[0]->bottomRight;
-	vertices[cv++] = _glyphs[0]->topRight;
-	vertices[cv++] = _glyphs[0]->topLeft;
+	_renderBatches.emplace_back(offset, 6, _glyphs[0].texture); // filling the first vector slot
+	vertices[cv++] = _glyphs[0].topLeft;
+	vertices[cv++] = _glyphs[0].bottomLeft;
+	vertices[cv++] = _glyphs[0].bottomRight;
+	vertices[cv++] = _glyphs[0].bottomRight;
+	vertices[cv++] = _glyphs[0].topRight;
+	vertices[cv++] = _glyphs[0].topLeft;
 	offset += 6;
 
 	int glyphsSize = _glyphs.size();
 	for (int cg = 1; cg < glyphsSize; cg++){
-		if (_glyphs[cg]->texture != _glyphs[cg - 1]->texture){ // as we sorted the glyphs vector by texture, same texture sprite will be next to each other
-			_renderBatches.emplace_back(offset, 6, _glyphs[cg]->texture); // only add new Batch if it has a new texture
+		if (_glyphs[cg].texture != _glyphs[cg - 1].texture){ // as we sorted the glyphs vector by texture, same texture sprite will be next to each other
+			_renderBatches.emplace_back(offset, 6, _glyphs[cg].texture); // only add new Batch if it has a new texture
 		}
 		else{
 			_renderBatches.back().numVertices += 6; // else adjust the size of numVertices
 		}
 		
-		vertices[cv++] = _glyphs[cg]->topLeft; // add the vertex position to the whole vector of vertices
-		vertices[cv++] = _glyphs[cg]->bottomLeft;
-		vertices[cv++] = _glyphs[cg]->bottomRight;
-		vertices[cv++] = _glyphs[cg]->bottomRight;
-		vertices[cv++] = _glyphs[cg]->topRight;
-		vertices[cv++] = _glyphs[cg]->topLeft;
+		vertices[cv++] = _glyphs[cg].topLeft; // add the vertex position to the whole vector of vertices
+		vertices[cv++] = _glyphs[cg].bottomLeft;
+		vertices[cv++] = _glyphs[cg].bottomRight;
+		vertices[cv++] = _glyphs[cg].bottomRight;
+		vertices[cv++] = _glyphs[cg].topRight;
+		vertices[cv++] = _glyphs[cg].topLeft;
 		offset += 6;
 	}
 
@@ -157,16 +134,16 @@ void SpriteBatch::sortGlyphs(){
 	}
 }
 
-bool SpriteBatch::compareFrontToBack(Glyph* a, Glyph* b){
-	return (a->depth < b->depth);
+bool SpriteBatch::compareFrontToBack(const Glyph& a, const Glyph& b){
+	return (a.depth < b.depth);
 }
 
-bool SpriteBatch::compareBackToFront(Glyph* a, Glyph* b){
-	return (a->depth > b->depth);
+bool SpriteBatch::compareBackToFront(const Glyph& a, const Glyph& b){
+	return (a.depth > b.depth);
 }
 
-bool SpriteBatch::compareTexture(Glyph* a, Glyph* b){
-	return (a->texture < b->texture);
+bool SpriteBatch::compareTexture(const Glyph& a, const Glyph& b){
+	return (a.texture < b.texture);
 }
 
 }

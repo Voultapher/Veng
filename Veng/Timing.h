@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-namespace Veng{
+namespace veng{
 
 class FpsLimiter{
 public:

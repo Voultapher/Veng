@@ -6,16 +6,19 @@
 #include "Physics2D.h"
 #include "InitPackage2D.h"
 #include "Render.h"
+#include "GROC.h"
 
-namespace Veng{
+
+namespace veng{
 
 class PhysicsManager
 {
 public:
+
 	PhysicsManager();
 	~PhysicsManager();
 
-	void init(unsigned int maxObjects, Render& render);
+	void init(std::size_t maxObjects, Render& render);
 
 	ObjectPhysics2D* addPhysicsObject(InitPackage2D& initPackage2D);
 

@@ -5,7 +5,7 @@
 #include "IOManager.h"
 #include "Errors.h"
 
-namespace Veng{
+namespace veng{
 
 	GLTexture ImageLoader::loadPNG(std::string filePath){
 		GLTexture texture{};

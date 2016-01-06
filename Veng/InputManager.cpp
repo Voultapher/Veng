@@ -1,7 +1,7 @@
 #include "InputManager.h"
 
 
-namespace Veng{
+namespace veng{
 
 InputManager::InputManager() :
 _mousePosition(0.0f)

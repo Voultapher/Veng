@@ -1,6 +1,6 @@
 #include "PhysicsManager.h"
 
-namespace Veng{
+namespace veng{
 
 PhysicsManager::PhysicsManager()
 {
@@ -11,10 +11,10 @@ PhysicsManager::~PhysicsManager()
 {
 }
 
-void PhysicsManager::init(unsigned int maxObjects, Render& render){
+void PhysicsManager::init(std::size_t maxObjects, Render& render){
 	_maxObjects = maxObjects;
 	_physics2D.reserveData(maxObjects);
-	render.linkRenderToPhysics(_physics2D.getObjects2D()); // somewhat frankestein code
+	render.linkRenderToPhysics(_physics2D.getObjects2D()); // somewhat frankenstein code
 }
 
 ObjectPhysics2D* PhysicsManager::addPhysicsObject(InitPackage2D& initPackage2D){

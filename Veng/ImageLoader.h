@@ -4,7 +4,7 @@
 
 #include "GLTexture.h"
 
-namespace Veng{
+namespace veng{
 
 	class ImageLoader
 	{

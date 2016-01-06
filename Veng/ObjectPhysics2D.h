@@ -3,9 +3,9 @@
 #include <glm/glm.hpp>
 
 #include "InitPackage2D.h"
-#include "Orientation2D.h"
+#include "Alignment2D.h"
 
-namespace Veng{
+namespace veng{
 
 class ObjectPhysics2D
 {

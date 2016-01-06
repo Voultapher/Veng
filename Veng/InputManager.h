@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <glm/glm.hpp>
 
-namespace Veng{
+namespace veng{
 
 class InputManager
 {

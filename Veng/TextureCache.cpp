@@ -3,7 +3,7 @@
 #include "TextureCache.h"
 #include "ImageLoader.h"
 
-namespace Veng{
+namespace veng{
 
 TextureCache::TextureCache()
 {

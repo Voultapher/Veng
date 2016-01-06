@@ -3,7 +3,7 @@
 #include "IOManager.h"
 #include "Errors.h"
 
-namespace Veng{
+namespace veng{
 
 	bool IOManager::readFileToBuffer(std::string filePath, std::vector<unsigned char>& buffer){
 		std::ifstream file(filePath, std::ios::binary);
@@ -23,6 +23,21 @@ namespace Veng{
 		buffer.resize(fileSize);
 		file.read((char *)&(buffer[0]), fileSize); // this si safe as we only read binary
 		file.close();
+
+		return true;
+	}
+
+	bool writeToFile(std::string filePath, std::string data){
+		static std::ofstream outputFile;
+
+		outputFile.open(filePath, std::ios::app);
+		if (outputFile.fail()){
+			std::perror(filePath.c_str());
+			return false;
+		}
+
+		outputFile  << data;
+		outputFile.close();
 
 		return true;
 	}

@@ -13,7 +13,7 @@
 #include "ObjectPhysics2D.h"
 
 
-namespace Veng{
+namespace veng{
 
 class Render
 {
@@ -21,7 +21,7 @@ public:
 	Render();
 	~Render();
 
-	void init(std::string windowName, int screenWidth, int windowFlags, unsigned int currentFlags, unsigned char vsyncFlag);
+	void init(std::string windowName, int screenWidth, int windowFlags, unsigned int currentFlags, Vsync vsyncMode);
 	void linkRenderToPhysics(std::vector<ObjectPhysics2D>* objects2D);
 
 	void update();
@@ -44,7 +44,7 @@ private:
 	std::vector<ObjectPhysics2D>*_objects2D;
 
 	glm::vec4 _normUV;
-	Veng::ColorRGBA8 _colorWhite;
+	veng::ColorRGBA8 _colorWhite;
 };
 
 }

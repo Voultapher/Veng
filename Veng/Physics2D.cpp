@@ -4,7 +4,7 @@
 
 #include "Errors.h"
 
-namespace Veng{
+namespace veng{
 
 Physics2D::Physics2D()
 {
@@ -15,7 +15,7 @@ Physics2D::~Physics2D()
 {
 }
 
-void Physics2D::reserveData(unsigned int objectCount){
+void Physics2D::reserveData(std::size_t objectCount){
 	_posAndBoundarys.reserve(objectCount);
 	_physicsObjects.reserve(objectCount);
 	std::size_t debug = sizeof(ObjectPhysics2D);
@@ -51,7 +51,7 @@ void Physics2D::update(){
 
 	for (auto& physicsObject : _physicsObjects){
 		if (physicsObject.isLocked() == false){
-			std::vector<Veng::ObjectPhysics2D*> intersectingObjects = findIntersection(physicsObject);
+			std::vector<veng::ObjectPhysics2D*> intersectingObjects = findIntersection(physicsObject);
 			if (intersectingObjects.size() > 0){
 				collide(physicsObject, intersectingObjects);
 			}
@@ -63,9 +63,9 @@ void Physics2D::update(){
 	}
 }
 
-std::vector<Veng::ObjectPhysics2D*> Physics2D::findIntersection(ObjectPhysics2D& physicsObject){ // naive implementation O(n^2)
+std::vector<veng::ObjectPhysics2D*> Physics2D::findIntersection(ObjectPhysics2D& physicsObject){ // naive implementation O(n^2)
 	glm::vec4 posA = physicsObject.getPosAndBoundary();
-	std::vector<Veng::ObjectPhysics2D* > intersectingObjects;
+	std::vector<veng::ObjectPhysics2D* > intersectingObjects;
 
 	int i = 0;
 	for (auto& posB : _posAndBoundarys){
@@ -95,7 +95,7 @@ bool Physics2D::twoObjectIntersection(ObjectPhysics2D* physicsObjectA, ObjectPhy
 	return false;
 }
 
-void Physics2D::collide(ObjectPhysics2D& objectA, std::vector<Veng::ObjectPhysics2D*> collisionGroup){
+void Physics2D::collide(ObjectPhysics2D& objectA, std::vector<veng::ObjectPhysics2D*> collisionGroup){
 	objectA.undoMovement();
 	for (auto collisionObject : collisionGroup){ // undo this cycles movement as it caused an intersection
 		collisionObject->undoMovement();

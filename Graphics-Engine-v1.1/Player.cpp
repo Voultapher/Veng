@@ -2,6 +2,7 @@
 
 Player::Player()
 {
+
 }
 
 
@@ -10,7 +11,7 @@ Player::~Player()
 	delete objectPhysics;
 }
 
-void Player::init(float life, float movementSpeed, Veng::ObjectPhysics2D* objectLink){
+void Player::init(float life, float movementSpeed, veng::ObjectPhysics2D* objectLink){
 	objectPhysics = objectLink;
 
 	_life = life;

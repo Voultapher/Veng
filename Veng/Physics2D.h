@@ -6,7 +6,7 @@
 
 #include "ObjectPhysics2D.h"
 
-namespace Veng{
+namespace veng{
 
 class Physics2D
 {
@@ -14,7 +14,7 @@ public:
 	Physics2D();
 	~Physics2D();
 
-	void reserveData(unsigned int objectCount);
+	void reserveData(std::size_t objectCount);
 
 	ObjectPhysics2D* addObject();
 	glm::vec4* addPosAndBoundary(glm::vec4 posAndBoundary);
@@ -28,9 +28,9 @@ private:
 	std::vector<glm::vec4> _posAndBoundarys;
 	std::vector<ObjectPhysics2D> _physicsObjects;
 
-	std::vector<Veng::ObjectPhysics2D* > findIntersection(ObjectPhysics2D& physicsObject);
+	std::vector<veng::ObjectPhysics2D* > findIntersection(ObjectPhysics2D& physicsObject);
 	bool twoObjectIntersection(ObjectPhysics2D* physicsObjectA, ObjectPhysics2D* physicsObjectB);
-	void collide(ObjectPhysics2D& objectA, std::vector<Veng::ObjectPhysics2D*> collisionGroup);
+	void collide(ObjectPhysics2D& objectA, std::vector<veng::ObjectPhysics2D*> collisionGroup);
 };
 
 }

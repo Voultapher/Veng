@@ -1,6 +1,6 @@
 #include "ObjectPhysics2D.h"
 
-namespace Veng{
+namespace veng{
 
 ObjectPhysics2D::ObjectPhysics2D() :
 	_locked(false),
@@ -36,7 +36,7 @@ void ObjectPhysics2D::init(InitPackage2D& initPackage, glm::vec4* posAndBoundary
 	setFriction(initPackage.friction);
 	_stationary = initPackage.stationanry;
 
-	_posAndSize = getAdjustedPosAndSize(initPackage.posAndSize, initPackage.orientationFlag);
+	_posAndSize = getAdjustedPosAndSize(initPackage.posAndSize, initPackage.alignment2D);
 	_posAndBoundary = posAndBoundaryLink;
 }
 

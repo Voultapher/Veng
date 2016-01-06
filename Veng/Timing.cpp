@@ -3,7 +3,7 @@
 #include "Timing.h"
 
 
-namespace Veng{
+namespace veng{
 
 FpsLimiter::FpsLimiter(){
 

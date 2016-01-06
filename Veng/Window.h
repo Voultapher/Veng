@@ -4,11 +4,11 @@
 
 #include <string>
 
-namespace Veng{
+namespace veng{
 
-	enum WindowFlags { INVISIBLE = 0x1, FULLSCREEN = 0x2, BORDERLESS = 0x4 };
+	namespace WindowFlag{ enum WindowFlags { INVISIBLE = 0x1, FULLSCREEN = 0x2, BORDERLESS = 0x4, RESIZABLE = 0x8 }; }
 
-	enum Vsync { VSYNC_ON = 0x1, VSYNC_OFF = 0x2 };
+	enum class Vsync { VSYNC_ON, VSYNC_OFF };
 
 	class Window
 	{
@@ -16,12 +16,12 @@ namespace Veng{
 		Window();
 		~Window();
 
-		int create(std::string windowName, int screenWidth, int screenHeight, unsigned int currentFlags, unsigned char vsyncFlag);
+		void create(std::string windowName, int screenWidth, int screenHeight, unsigned int currentFlags, Vsync vsyncMode);
 
 		void swapBuffer();
 
-		int getScreenWidth() { _screenWidth; }
-		int getScreenHeight() { _screenHeight; }
+		int getScreenWidth() const { _screenWidth; }
+		int getScreenHeight() const { _screenHeight; }
 
 	private:
 		SDL_Window* _sdlWindow;
